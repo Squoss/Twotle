@@ -23,9 +23,9 @@
  */
 
 import React, { useContext, useState } from "react";
-import { DayPicker } from "react-day-picker";
-import { de, enUS } from "react-day-picker/locale";
-import "react-day-picker/style.css";
+import { DayPicker } from "@daypicker/react";
+import { de, enUS } from "@daypicker/react/locale";
+import "@daypicker/react/style.css";
 import { l10nContext } from "../l10nContext";
 import { ElectionCandidatesProps } from "../props/ElectionCandidatesProps";
 
