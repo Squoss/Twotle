@@ -45,12 +45,7 @@ class ReactController @Inject() (
     with I18nSupport {
 
   val is = env.classLoader.getResourceAsStream("public/build/index.html")
-  val bufferedSource = Source.createBufferedSource(
-    inputStream = is,
-    close = () => is.close()
-  )(Codec.UTF8)
-  val stringBuilder = bufferedSource.addString(new StringBuilder())
-  val indexHtml = stringBuilder.mkString
+  val indexHtml = Source.fromInputStream(is)(Codec.UTF8).mkString // or use java.nio.Files, cf. Scala for the Impatient (§9.2) and https://horstmann.com/unblog/2023-04-09/index.html
 
   def guiFile(reactFile: String) = Action {
     implicit request: Request[AnyContent] =>
