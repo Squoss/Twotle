@@ -1,5 +1,7 @@
 name := "Fixadat"
 
+version := "ToBeDetermined"
+
 organization := "com.squeng"
 organizationName := "Squeng AG"
 organizationHomepage := Some(url("https://www.squeng.com/"))
@@ -8,8 +10,6 @@ homepage := Some(url("https://fixadat.com"))
 startYear := Some(2021)
 description := "a tip of the hat to classic Doodle"
 licenses += "MIT" -> url("https://choosealicense.com/licenses/mit/")
-
-version := "MVP"
 
 lazy val root = (project in file("."))
     .enablePlugins(PlayScala)
@@ -32,3 +32,6 @@ libraryDependencies += "com.tngtech.archunit" % "archunit" % "1.4.2" % Test
 
 // Adds additional packages into conf/routes
 // play.sbt.routes.RoutesKeys.routesImport += "com.squeng.binders._"
+
+Compile / doc / sources                := Seq.empty
+Compile / packageDoc / publishArtifact := false
