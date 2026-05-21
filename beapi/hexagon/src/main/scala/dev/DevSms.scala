@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright (c) 2021-2025 Squeng AG
+ * Copyright (c) 2021-2026 Squeng AG
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,23 +24,16 @@
 
 package dev
 
-import domain.driven_ports.notifications.Email
-import domain.value_objects.EmailAddress
-import play.api.Logging
+import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber
+import domain.driven_ports.notifications.Sms
 
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
-class DevEmail @Inject() (implicit ec: ExecutionContext)
-    extends Email
-    with Logging {
+class DevSms @Inject() (implicit ec: ExecutionContext) extends Sms {
 
-  override def send(
-      to: EmailAddress,
-      subject: String,
-      plainText: String
-  ): Future[Unit] = Future(
-    logger.info(s"Email with subject $subject to $to <= $plainText")
+  override def send(to: PhoneNumber, text: String): Future[Unit] = Future(
+    println(s"Text to $to <= $text")
   )
 }

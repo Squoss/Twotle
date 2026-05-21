@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright (c) 2021-2025 Squeng AG
+ * Copyright (c) 2021-2026 Squeng AG
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +29,6 @@ import domain.driven_ports.persistence.ElectionEvent
 import domain.driven_ports.persistence.PublishedEvent
 import domain.value_objects.ElectionSnapshot
 import domain.value_objects.Id
-import play.api.Logging
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -38,9 +37,7 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
 @Singleton
-class DevRepository @Inject() (implicit ec: ExecutionContext)
-    extends Repository
-    with Logging {
+class DevRepository @Inject() (implicit ec: ExecutionContext) extends Repository {
 
   private val eventsLog =
     mutable.Map[Id, mutable.Buffer[ElectionEvent]]()
@@ -54,7 +51,7 @@ class DevRepository @Inject() (implicit ec: ExecutionContext)
     }
 
   override def logEvent(event: ElectionEvent): Future[Unit] = {
-    logger.info(s"adding event ${event}")
+    println(s"adding event ${event}")
 
     eventsLog(event.id) += event
     Future(())
