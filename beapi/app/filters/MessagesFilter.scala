@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright (c) 2021-2023 Squeng AG
+ * Copyright (c) 2021-2026 Squeng AG
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -44,27 +44,22 @@ class MessagesFilter @Inject() (implicit
     val mat: Materializer,
     ec: ExecutionContext,
     config: Configuration
-) extends Filter {
+) extends Filter:
+
+  // cannot use I18nSupport above (this is a filter, not a controller) and therefore not result.withLang below
 
   def apply(
       nextFilter: RequestHeader => Future[Result]
-  )(requestHeader: RequestHeader): Future[Result] = {
-
-    // cannot use I18nSupport above (this is a filter, not a controller) and therefore not result.withLang below
+  )(requestHeader: RequestHeader): Future[Result] =
     // https://www.playframework.com/documentation/latest/ScalaI18N#Language-Cookie-Support
-    // for future reference: https://www.playframework.com/documentation/latest/api/scala/play/api/i18n/MessagesApi.html#setLang(result:play.api.mvc.Result,lang:play.api.i18n.Lang):play.api.mvc.Result
     val cookieName = config
       .getOptional[String]("play.i18n.langCookieName")
       .getOrElse("PLAY_LANG")
-    val query = requestHeader.queryString
     val newLocale =
-      query.get("locale").flatMap(_.headOption.flatMap(Lang.get(_)))
-    if (newLocale.isEmpty) {
-      nextFilter(requestHeader).map { result => result }
-    } else {
-      nextFilter(requestHeader.withTransientLang(newLocale.get)).map { result =>
-        result.withCookies(Cookie(cookieName, newLocale.get.code))
-      }
-    }
-  }
-}
+      requestHeader.queryString.get("locale").flatMap(_.headOption.flatMap(Lang.get(_)))
+    newLocale
+      .map(lang =>
+        nextFilter(requestHeader.withTransientLang(lang))
+          .map(result => result.withCookies(Cookie(cookieName, lang.code)))
+      )
+      .getOrElse(nextFilter(requestHeader))
