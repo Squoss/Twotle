@@ -1,10 +1,10 @@
 scalaVersion := "3.3.7"
-// https://docs.scala-lang.org/scala3/reference/experimental/explicit-nulls.html
-// scalacOptions += "-Yexplicit-nulls" 
+scalacOptions += "-no-indent" // https://docs.scala-lang.org/scala3/reference/other-new-features/indentation.html
+// scalacOptions += "-Yexplicit-nulls" // https://docs.scala-lang.org/scala3/reference/experimental/explicit-nulls.html
 // but waiting for Scala LTS with https://docs.scala-lang.org/scala3/reference/experimental/explicit-nulls.html#java-interoperability-and-flexible-types
 
 libraryDependencies += "com.google.inject" % "guice" % "6.0.0"
-libraryDependencies += "com.googlecode.libphonenumber" % "libphonenumber" % "9.0.30"
+libraryDependencies += "com.googlecode.libphonenumber" % "libphonenumber" % "9.0.31"
 libraryDependencies += "commons-validator" % "commons-validator" % "1.10.1"
 
 // using https://scalameta.org/munit/ from the https://docs.scala-lang.org/toolkit/introduction.html#what-is-the-scala-toolkit

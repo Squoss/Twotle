@@ -44,13 +44,13 @@ class MessagesFilter @Inject() (implicit
     val mat: Materializer,
     ec: ExecutionContext,
     config: Configuration
-) extends Filter:
+) extends Filter {
 
   // cannot use I18nSupport above (this is a filter, not a controller) and therefore not result.withLang below
 
   def apply(
       nextFilter: RequestHeader => Future[Result]
-  )(requestHeader: RequestHeader): Future[Result] =
+  )(requestHeader: RequestHeader): Future[Result] = {
     // https://www.playframework.com/documentation/latest/ScalaI18N#Language-Cookie-Support
     val cookieName = config
       .getOptional[String]("play.i18n.langCookieName")
@@ -63,3 +63,5 @@ class MessagesFilter @Inject() (implicit
           .map(result => result.withCookies(Cookie(cookieName, lang.code)))
       )
       .getOrElse(nextFilter(requestHeader))
+  }
+}
