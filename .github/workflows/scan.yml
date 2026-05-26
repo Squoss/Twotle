@@ -17,7 +17,7 @@ jobs:
         # Disabling shallow clone is recommended for improving relevancy of reporting
           fetch-depth: 0
       - name: back-end and front-end
-        uses: SonarSource/sonarqube-scan-action@v7
+        uses: SonarSource/sonarqube-scan-action@v8
         with:
           # https://docs.sonarcloud.io/advanced-setup/analysis-scope/#restrict-the-scope-of-analysis-in-general
           args: >
