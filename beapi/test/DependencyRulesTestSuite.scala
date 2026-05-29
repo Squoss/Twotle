@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright (c) 2021-2025 Squeng AG
+ * Copyright (c) 2021-2026 Squeng AG
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -39,7 +39,7 @@ class DependencyRulesTestSuite extends AnyFunSuite {
   val FILTERS = "filters.."
   val GUI = "gui.."
   val JAVA = "java.."
-  val JAVAX = "javax.."
+  val JAVAX = "jakarta.."
   val MAILJET = "com.mailjet.."
   val MONGODB_ADAPTER =
     "mongodb.." // the MongoDB driver starts its packages with com or org

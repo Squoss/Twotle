@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright (c) 2021-2022 Squeng AG
+ * Copyright (c) 2021-2026 Squeng AG
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,14 +28,14 @@ import com.google.i18n.phonenumbers.PhoneNumberUtil
 import com.google.i18n.phonenumbers.PhoneNumberUtil.PhoneNumberType
 import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber
 import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber.CountryCodeSource
+import jakarta.inject.Inject
+import jakarta.inject.Singleton
 import org.apache.commons.validator.routines.EmailValidator
 import org.apache.commons.validator.routines.UrlValidator
 import play.api.libs.json.Json
 import play.api.mvc.BaseController
 import play.api.mvc.ControllerComponents
 
-import javax.inject.Inject
-import javax.inject.Singleton
 import scala.util.Failure
 import scala.util.Success
 import scala.util.Try

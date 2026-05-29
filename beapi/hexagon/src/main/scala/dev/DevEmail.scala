@@ -26,8 +26,8 @@ package dev
 
 import domain.driven_ports.notifications.Email
 import domain.value_objects.EmailAddress
+import jakarta.inject.Inject
 
-import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 

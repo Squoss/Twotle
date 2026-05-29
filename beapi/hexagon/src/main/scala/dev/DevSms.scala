@@ -26,8 +26,8 @@ package dev
 
 import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber
 import domain.driven_ports.notifications.Sms
+import jakarta.inject.Inject
 
-import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 

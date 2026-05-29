@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright (c) 2021-2025 Squeng AG
+ * Copyright (c) 2021-2026 Squeng AG
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,7 @@
 
 package api
 
-import api.TransferObjects._
+import api.TransferObjects.*
 import domain.driving_ports.Elections
 import domain.driving_ports.Factory
 import domain.value_objects.AccessToken
@@ -33,6 +33,7 @@ import domain.value_objects.Error.*
 import domain.value_objects.Id
 import domain.value_objects.Visibility
 import domain.value_objects.Visibility.*
+import jakarta.inject.Inject
 import play.api.Environment
 import play.api.i18n.I18nSupport
 import play.api.libs.json.JsError
@@ -48,7 +49,6 @@ import java.time.Instant
 import java.time.ZoneId
 import java.util.TimeZone
 import java.util.UUID
-import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 import scala.util.Failure
@@ -191,25 +191,24 @@ class ElectionsController @Inject() (implicit
     }
   }
 
-  def putNominees(election: Id) = Action.async(validateJson[Nominations]) {
-    request =>
-      Try(UUID.fromString(request.headers(xAccessToken))) match {
-        case Success(accessToken) =>
-          elections
-            .nominateCandidates(
-              election,
-              AccessToken(accessToken),
-              request.body.timeZone,
-              request.body.candidates
+  def putNominees(election: Id) = Action.async(validateJson[Nominations]) { request =>
+    Try(UUID.fromString(request.headers(xAccessToken))) match {
+      case Success(accessToken) =>
+        elections
+          .nominateCandidates(
+            election,
+            AccessToken(accessToken),
+            request.body.timeZone,
+            request.body.candidates
+          )
+          .map(
+            _.fold(
+              toErrorResponse(_),
+              _ => NoContent
             )
-            .map(
-              _.fold(
-                toErrorResponse(_),
-                _ => NoContent
-              )
-            )
-        case Failure(exception) => Future(Forbidden(exception.getMessage))
-      }
+          )
+      case Failure(exception) => Future(Forbidden(exception.getMessage))
+    }
   }
 
   def deleteElection(election: Id) = Action.async { request =>
@@ -257,29 +256,28 @@ class ElectionsController @Inject() (implicit
       }
     }
 
-  def deleteVote(election: Id, name: String, voted: String) = Action.async {
-    request =>
-      Try(UUID.fromString(request.headers(xAccessToken))) match {
-        case Success(accessToken) =>
-          elections
-            .deleteVote(
-              election,
-              AccessToken(accessToken),
-              request.host,
-              name,
-              Instant.parse(voted),
-              messagesApi("votes.revoked.subject")(request.lang),
-              messagesApi("votes.revoked.plainText")(request.lang),
-              messagesApi("votes.revoked.text")(request.lang)
+  def deleteVote(election: Id, name: String, voted: String) = Action.async { request =>
+    Try(UUID.fromString(request.headers(xAccessToken))) match {
+      case Success(accessToken) =>
+        elections
+          .deleteVote(
+            election,
+            AccessToken(accessToken),
+            request.host,
+            name,
+            Instant.parse(voted),
+            messagesApi("votes.revoked.subject")(request.lang),
+            messagesApi("votes.revoked.plainText")(request.lang),
+            messagesApi("votes.revoked.text")(request.lang)
+          )
+          .map(
+            _.fold(
+              toErrorResponse(_),
+              _ => NoContent
             )
-            .map(
-              _.fold(
-                toErrorResponse(_),
-                _ => NoContent
-              )
-            )
-        case Failure(exception) => Future(Forbidden(exception.getMessage))
-      }
+          )
+      case Failure(exception) => Future(Forbidden(exception.getMessage))
+    }
   }
 
   def postReminder(election: Id) =

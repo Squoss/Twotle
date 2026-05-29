@@ -24,14 +24,14 @@
 
 package dev
 
-import domain.driven_ports.persistence.Repository
 import domain.driven_ports.persistence.ElectionEvent
 import domain.driven_ports.persistence.PublishedEvent
+import domain.driven_ports.persistence.Repository
 import domain.value_objects.ElectionSnapshot
 import domain.value_objects.Id
+import jakarta.inject.Inject
+import jakarta.inject.Singleton
 
-import javax.inject.Inject
-import javax.inject.Singleton
 import scala.collection.mutable
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future

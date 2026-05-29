@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright (c) 2021-2025 Squeng AG
+ * Copyright (c) 2021-2026 Squeng AG
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,8 +25,8 @@
 package domain.services
 
 import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber
-import domain.driving_ports.Elections
-import domain.driving_ports.Factory
+import domain.driven_ports.notifications.Email
+import domain.driven_ports.notifications.Sms
 import domain.driven_ports.persistence.CandidatesNominatedEvent
 import domain.driven_ports.persistence.PrivatizedEvent
 import domain.driven_ports.persistence.ProtectedEvent
@@ -37,6 +37,8 @@ import domain.driven_ports.persistence.RetextedEvent
 import domain.driven_ports.persistence.SubscribedEvent
 import domain.driven_ports.persistence.VoteDeletedEvent
 import domain.driven_ports.persistence.VotedEvent
+import domain.driving_ports.Elections
+import domain.driving_ports.Factory
 import domain.entities.ElectionEntity
 import domain.value_objects.AccessToken
 import domain.value_objects.Availability
@@ -48,8 +50,7 @@ import domain.value_objects.Error.*
 import domain.value_objects.Id
 import domain.value_objects.Visibility.*
 import domain.value_objects.Vote
-import domain.driven_ports.notifications.Email
-import domain.driven_ports.notifications.Sms
+import jakarta.inject.Inject
 
 import java.net.URL
 import java.text.MessageFormat
@@ -60,7 +61,6 @@ import java.time.ZonedDateTime
 import java.util.Locale
 import java.util.TimeZone
 import java.util.UUID
-import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
@@ -69,7 +69,8 @@ class ElectionsService @Inject() (implicit
     repository: Repository,
     email: Email,
     sms: Sms
-) extends Factory, Elections {
+) extends Factory,
+      Elections {
 
   val canaryToken = AccessToken(new UUID(0, 0))
 
@@ -98,13 +99,13 @@ class ElectionsService @Inject() (implicit
     repository
       .readEvents(id)
       .map(_ match {
-        case (Some(snapshot), Nil) => Some(snapshot)
+        case (Some(snapshot), Nil)        => Some(snapshot)
         case (Some(snapshot), eventsTail) => {
           val election = ElectionEntity(snapshot).replay(eventsTail).toSnapshot()
           repository.fastForwardSnapshot(election) // fire & forget
           Some(election)
         }
-        case (None, Nil) => None
+        case (None, Nil)    => None
         case (None, events) => {
           val election = ElectionEntity(events).toSnapshot()
           repository.fastForwardSnapshot(election) // fire & forget
@@ -121,9 +122,7 @@ class ElectionsService @Inject() (implicit
       _.map(Right(_))
         .getOrElse(Left(NotFound))
         .flatMap(election =>
-          if (
-            token == election.voterToken || token == election.organizerToken
-          ) {
+          if (token == election.voterToken || token == election.organizerToken) {
             if (election.visibility != Private) {
               var e = if (token == election.organizerToken) { election }
               else {
@@ -217,9 +216,7 @@ class ElectionsService @Inject() (implicit
       .flatMap(election =>
         if (token != election.organizerToken) {
           Left(AccessDenied)
-        } else if (
-          election.timeZone == timeZone && election.candidates == candidates
-        ) {
+        } else if (election.timeZone == timeZone && election.candidates == candidates) {
           Right(false)
         } else {
           repository.logEvent(

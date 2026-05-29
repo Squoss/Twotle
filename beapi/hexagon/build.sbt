@@ -3,7 +3,7 @@ scalacOptions += "-no-indent" // https://docs.scala-lang.org/scala3/reference/ot
 // scalacOptions += "-Yexplicit-nulls" // https://docs.scala-lang.org/scala3/reference/experimental/explicit-nulls.html
 // but waiting for Scala LTS with https://docs.scala-lang.org/scala3/reference/experimental/explicit-nulls.html#java-interoperability-and-flexible-types
 
-libraryDependencies += "com.google.inject" % "guice" % "6.0.0"
+libraryDependencies += "jakarta.inject" % "jakarta.inject-api" % "2.0.1"
 libraryDependencies += "com.googlecode.libphonenumber" % "libphonenumber" % "9.0.31"
 libraryDependencies += "commons-validator" % "commons-validator" % "1.10.1"
 

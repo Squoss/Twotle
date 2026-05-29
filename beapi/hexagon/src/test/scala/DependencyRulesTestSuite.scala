@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright (c) 2021-2025 Squeng AG
+ * Copyright (c) 2021-2026 Squeng AG
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -37,7 +37,7 @@ class DependencyRulesTestSuite extends FunSuite {
   val SERVICES = "domain.services.."
   val VALUE_OBJECTS = "domain.value_objects.."
   val JAVA = "java.."
-  val JAVAX = "javax.."
+  val JAVAX = "jakarta.."
   val PHONENUMBERS = "com.google.i18n.phonenumbers.."
   val SCALA = "scala.."
 

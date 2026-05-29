@@ -24,6 +24,7 @@
 
 package filters
 
+import jakarta.inject.Inject
 import org.apache.pekko.stream.Materializer
 import play.api.Configuration
 import play.api.Logging
@@ -36,7 +37,6 @@ import play.api.mvc.Result
 import play.api.routing.HandlerDef
 import play.api.routing.Router
 
-import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 

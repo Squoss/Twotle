@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright (c) 2021-2023 Squeng AG
+ * Copyright (c) 2021-2026 Squeng AG
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,6 +29,8 @@ package mongodb
 import com.mongodb.MongoClientSettings
 import com.mongodb.reactivestreams.client.MongoClients
 import com.mongodb.reactivestreams.client.MongoCollection
+import jakarta.inject.Inject
+import jakarta.inject.Singleton
 import org.bson.BsonDocument
 import org.bson.UuidRepresentation
 import org.bson.codecs.UuidCodec
@@ -37,8 +39,6 @@ import play.api.Configuration
 import play.api.Logging
 import play.api.inject.ApplicationLifecycle
 
-import javax.inject.Inject
-import javax.inject.Singleton
 import scala.concurrent.Future
 
 @Singleton

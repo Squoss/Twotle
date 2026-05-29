@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright (c) 2021-2025 Squeng AG
+ * Copyright (c) 2021-2026 Squeng AG
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -53,6 +53,7 @@ import domain.value_objects.Id
 import domain.value_objects.Visibility
 import domain.value_objects.Visibility.*
 import domain.value_objects.Vote
+import jakarta.inject.Inject
 import org.bson.BsonArray
 import org.bson.BsonBinary
 import org.bson.BsonDateTime // not org.bson.BsonTimestamp, which is for internal MongoDB use (https://www.mongodb.com/docs/manual/reference/bson-types/#timestamps)
@@ -70,17 +71,14 @@ import java.time.Instant
 import java.time.LocalDateTime
 import java.util.Locale
 import java.util.TimeZone
-import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 import scala.concurrent.Promise
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 import scala.util.Failure
 import scala.util.Success
 
-class MdbRepository @Inject() (implicit ec: ExecutionContext, val mdb: Mdb)
-    extends Repository
-    with Logging {
+class MdbRepository @Inject() (implicit ec: ExecutionContext, val mdb: Mdb) extends Repository with Logging {
 
   val Collection = "elections"
   val IdKey = "id"
@@ -268,9 +266,7 @@ class MdbRepository @Inject() (implicit ec: ExecutionContext, val mdb: Mdb)
           NameKey -> new BsonString(name)
         ).toList.map(entry => new BsonElement(entry._1, entry._2)).asJava
       )
-      description.foreach(d =>
-        document.append(DescriptionKey, new BsonString(d))
-      )
+      description.foreach(d => document.append(DescriptionKey, new BsonString(d)))
       logEvent(event.id, document)
     case CandidatesNominatedEvent(_, timeZone, candidates, _) =>
       val document = new BsonDocument(
@@ -281,9 +277,7 @@ class MdbRepository @Inject() (implicit ec: ExecutionContext, val mdb: Mdb)
           CandidatesKey -> fromCandidates(candidates)
         ).toList.map(entry => new BsonElement(entry._1, entry._2)).asJava
       )
-      timeZone.foreach(tz =>
-        document.append(TimeZoneKey, new BsonString(tz.getID))
-      )
+      timeZone.foreach(tz => document.append(TimeZoneKey, new BsonString(tz.getID)))
       logEvent(event.id, document)
     case SubscribedEvent(_, locale, email, text, webHook, _) =>
       val document = new BsonDocument(
@@ -294,9 +288,7 @@ class MdbRepository @Inject() (implicit ec: ExecutionContext, val mdb: Mdb)
           LocaleKey -> new BsonString(locale.toLanguageTag)
         ).toList.map(entry => new BsonElement(entry._1, entry._2)).asJava
       )
-      email.foreach(ea =>
-        document.append(EmailAddressKey, new BsonString(ea.wert))
-      )
+      email.foreach(ea => document.append(EmailAddressKey, new BsonString(ea.wert)))
       text.foreach(pn =>
         document.append(
           PhoneNumberKey,
@@ -307,9 +299,7 @@ class MdbRepository @Inject() (implicit ec: ExecutionContext, val mdb: Mdb)
           )
         )
       )
-      webHook.foreach(u =>
-        document.append(UrlKey, new BsonString(u.toExternalForm))
-      )
+      webHook.foreach(u => document.append(UrlKey, new BsonString(u.toExternalForm)))
       logEvent(event.id, document)
     case ProtectedEvent(_, _) =>
       logEvent(event, ProtectedValue)
@@ -327,9 +317,7 @@ class MdbRepository @Inject() (implicit ec: ExecutionContext, val mdb: Mdb)
           AvailabilityKey -> fromAvailability(availability)
         ).toList.map(entry => new BsonElement(entry._1, entry._2)).asJava
       )
-      timeZone.foreach(tz =>
-        document.append(TimeZoneKey, new BsonString(tz.getID))
-      )
+      timeZone.foreach(tz => document.append(TimeZoneKey, new BsonString(tz.getID)))
       logEvent(event.id, document)
     case VoteDeletedEvent(_, name, voted, _) =>
       val document = new BsonDocument(
@@ -386,7 +374,8 @@ class MdbRepository @Inject() (implicit ec: ExecutionContext, val mdb: Mdb)
               .getString(TimeZoneKey, null)
           )
             .map(tz => TimeZone.getTimeZone(tz.getValue)),
-          doc.getArray(CandidatesKey)
+          doc
+            .getArray(CandidatesKey)
             .getValues
             .asScala
             .toSet
@@ -515,7 +504,7 @@ class MdbRepository @Inject() (implicit ec: ExecutionContext, val mdb: Mdb)
       .projection(Projections.exclude(EventsKey))
   )
     .flatMap(_ match {
-      case Nil => Future((None, Seq()))
+      case Nil           => Future((None, Seq()))
       case Seq(document) =>
         val replayedEvents = document.getInt32(ReplayedEventsKey).getValue.toInt
         toFutureDocSeq(
@@ -558,9 +547,7 @@ class MdbRepository @Inject() (implicit ec: ExecutionContext, val mdb: Mdb)
 
   private def fromCandidates(candidates: Set[LocalDateTime]): BsonArray = {
     val bsonArray = new BsonArray()
-    candidates.foreach(candidate =>
-      bsonArray.add(new BsonString(candidate.toString))
-    )
+    candidates.foreach(candidate => bsonArray.add(new BsonString(candidate.toString)))
     bsonArray
   }
 
@@ -612,9 +599,7 @@ class MdbRepository @Inject() (implicit ec: ExecutionContext, val mdb: Mdb)
       LocaleKey,
       new BsonString(subscriptions._1.toLanguageTag)
     )
-    subscriptions._2.foreach(ea =>
-      bsonDocument.append(EmailAddressKey, new BsonString(ea.wert))
-    )
+    subscriptions._2.foreach(ea => bsonDocument.append(EmailAddressKey, new BsonString(ea.wert)))
     subscriptions._3.foreach(pn =>
       bsonDocument.append(
         PhoneNumberKey,
@@ -625,9 +610,7 @@ class MdbRepository @Inject() (implicit ec: ExecutionContext, val mdb: Mdb)
         )
       )
     )
-    subscriptions._4.foreach(u =>
-      bsonDocument.append(UrlKey, new BsonString(u.toExternalForm))
-    )
+    subscriptions._4.foreach(u => bsonDocument.append(UrlKey, new BsonString(u.toExternalForm)))
     bsonDocument
   }
 
@@ -644,9 +627,7 @@ class MdbRepository @Inject() (implicit ec: ExecutionContext, val mdb: Mdb)
           .getString(PhoneNumberKey, null)
       )
         .map(pn => PhoneNumberUtil.getInstance().parse(pn.getValue, "CH")),
-      Option(document.getString(UrlKey, null)).map(u =>
-        URI.create(u.getValue).toURL
-      )
+      Option(document.getString(UrlKey, null)).map(u => URI.create(u.getValue).toURL)
     )
   }
 
@@ -666,12 +647,8 @@ class MdbRepository @Inject() (implicit ec: ExecutionContext, val mdb: Mdb)
         SubscriptionsKey -> fromSubscriptions(snapshot.subscriptions)
       ).toList.map(entry => new BsonElement(entry._1, entry._2)).asJava
     )
-    snapshot.description.foreach(d =>
-      document.append(DescriptionKey, new BsonString(d))
-    )
-    snapshot.timeZone.foreach(tz =>
-      document.append(TimeZoneKey, new BsonString(tz.getID))
-    )
+    snapshot.description.foreach(d => document.append(DescriptionKey, new BsonString(d)))
+    snapshot.timeZone.foreach(tz => document.append(TimeZoneKey, new BsonString(tz.getID)))
     toFutureResult(
       mdb(Collection)
         .updateOne(

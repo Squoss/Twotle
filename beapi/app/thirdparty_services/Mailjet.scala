@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright (c) 2021-2025 Squeng AG
+ * Copyright (c) 2021-2026 Squeng AG
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,7 +26,10 @@ package thirdparty_services
 
 import com.google.i18n.phonenumbers.PhoneNumberUtil
 import com.google.i18n.phonenumbers.Phonenumber
+import domain.driven_ports.notifications.Email
+import domain.driven_ports.notifications.Sms
 import domain.value_objects.EmailAddress
+import jakarta.inject.Inject
 import play.api.Configuration
 import play.api.Logging
 import play.api.libs.json.JsArray
@@ -37,10 +40,7 @@ import play.api.libs.ws.WSBodyWritables.writeableOf_JsValue
 import play.api.libs.ws.WSClient
 import play.api.libs.ws.WSRequest
 import play.api.libs.ws.WSResponse
-import domain.driven_ports.notifications.Email
-import domain.driven_ports.notifications.Sms
 
-import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 

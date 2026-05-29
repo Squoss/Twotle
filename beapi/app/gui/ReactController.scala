@@ -24,6 +24,8 @@
 
 package gui
 
+import jakarta.inject.Inject
+import jakarta.inject.Singleton
 import play.api.Environment
 import play.api.i18n.I18nSupport
 import play.api.mvc.AnyContent
@@ -32,8 +34,6 @@ import play.api.mvc.ControllerComponents
 import play.api.mvc.Request
 import play.filters.csrf.CSRF
 
-import javax.inject.Inject
-import javax.inject.Singleton
 import scala.io.Codec
 import scala.io.Source
 
@@ -45,27 +45,27 @@ class ReactController @Inject() (
     with I18nSupport {
 
   val is = env.classLoader.getResourceAsStream("public/build/index.html")
-  val indexHtml = Source.fromInputStream(is)(Codec.UTF8).mkString // or use java.nio.Files, cf. Scala for the Impatient (§9.2) and https://horstmann.com/unblog/2023-04-09/index.html
+  val indexHtml = Source
+    .fromInputStream(is)(Codec.UTF8)
+    .mkString // or use java.nio.Files, cf. Scala for the Impatient (§9.2) and https://horstmann.com/unblog/2023-04-09/index.html
 
-  def guiFile(reactFile: String) = Action {
-    implicit request: Request[AnyContent] =>
-      implicit val ec: scala.concurrent.ExecutionContext =
-        scala.concurrent.ExecutionContext.global
-      Ok.sendResource(
-        s"public/build/$reactFile",
-        env.classLoader
-      ) // TODO/FIXME: check for path-traversal vulnerability
+  def guiFile(reactFile: String) = Action { implicit request: Request[AnyContent] =>
+    implicit val ec: scala.concurrent.ExecutionContext =
+      scala.concurrent.ExecutionContext.global
+    Ok.sendResource(
+      s"public/build/$reactFile",
+      env.classLoader
+    ) // TODO/FIXME: check for path-traversal vulnerability
   }
 
-  def guiRoute(reactRoute: String) = Action {
-    implicit request: Request[AnyContent] =>
-      val token =
-        CSRF.getToken // // https://www.playframework.com/documentation/latest/ScalaCsrf#Getting-the-current-token
-      Ok(
-        indexHtml
-          .replace("REPLACE_CSRF_TOKEN", token.get.value)
-          .replace("REPLACE_LANG", messagesApi("locale")(request.lang))
-      )
-        .as("text/html")
+  def guiRoute(reactRoute: String) = Action { implicit request: Request[AnyContent] =>
+    val token =
+      CSRF.getToken // // https://www.playframework.com/documentation/latest/ScalaCsrf#Getting-the-current-token
+    Ok(
+      indexHtml
+        .replace("REPLACE_CSRF_TOKEN", token.get.value)
+        .replace("REPLACE_LANG", messagesApi("locale")(request.lang))
+    )
+      .as("text/html")
   }
 }
