@@ -6,19 +6,19 @@
     "@popperjs/core": "^2.11.8",
     "bootstrap": "^5.3.8",
     "bootstrap-icons": "^1.13.1",
-    "react": "^19.2.6",
+    "react": "^19.2.7",
     "@daypicker/react": "^10.0.1",
-    "react-dom": "^19.2.6",
-    "react-router-dom": "^7.16.0"
+    "react-dom": "^19.2.7",
+    "react-router-dom": "^7.17.0"
   },
   "devDependencies": {
-    "@types/bootstrap": "^5.2.10",
-    "@types/node": "^25.9.1",
-    "@types/react": "^19.2.15",
+    "@types/bootstrap": "^5.2.11",
+    "@types/node": "^25.9.2",
+    "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.2",
     "typescript": "^6.0.3",
-    "vite": "^8.0.15"
+    "vite": "^8.0.16"
   },
   "scripts": {
     "start": "vite",
