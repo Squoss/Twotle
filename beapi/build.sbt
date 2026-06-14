@@ -18,7 +18,7 @@ lazy val root = (project in file("."))
     .dependsOn(hexagon)
 lazy val hexagon = project
 
-scalaVersion := "3.3.7"
+scalaVersion := "3.3.8"
 scalacOptions += "-no-indent" // https://docs.scala-lang.org/scala3/reference/other-new-features/indentation.html
 
 libraryDependencies += guice
