@@ -22,9 +22,9 @@
  * THE SOFTWARE.
  */
 
-package api
+package controllers.api
 
-import api.TransferObjects.*
+import controllers.api.TransferObjects.*
 import domain.driving_ports.Elections
 import domain.driving_ports.Factory
 import domain.value_objects.AccessToken

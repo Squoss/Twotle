@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright (c) 2021-2025 Squeng AG
+ * Copyright (c) 2021-2026 Squeng AG
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,7 +22,7 @@
  * THE SOFTWARE.
  */
 
-package api
+package controllers.api
 
 import com.google.i18n.phonenumbers.PhoneNumberUtil
 import com.google.i18n.phonenumbers.PhoneNumberUtil.PhoneNumberFormat
@@ -35,7 +35,7 @@ import domain.value_objects.Id
 import domain.value_objects.Visibility
 import domain.value_objects.Visibility.*
 import domain.value_objects.Vote
-import play.api.libs.json._
+import play.api.libs.json.*
 
 import java.net.URI
 import java.net.URL

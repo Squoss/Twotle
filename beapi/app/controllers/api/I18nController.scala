@@ -22,7 +22,7 @@
  * THE SOFTWARE.
  */
 
-package api
+package controllers.api
 
 import jakarta.inject.Inject
 import play.api.i18n.I18nSupport

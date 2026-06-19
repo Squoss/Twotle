@@ -29,7 +29,7 @@ import org.scalatest.funsuite.AnyFunSuite
 class DependencyRulesTestSuite extends AnyFunSuite {
 
   val PEKKO = "org.apache.pekko.."
-  val API = "api.."
+  val API = "controllers.api.."
   // val DEFAULT = ""
   val DEV = "dev.."
   val DOMAIN_ENTITYINTS = "domain.entity_interfaces.."
@@ -37,7 +37,7 @@ class DependencyRulesTestSuite extends AnyFunSuite {
   val DOMAIN_PERSISTENCE = "domain.driven_ports.persistence.."
   val DOMAIN_VALUEOBJECTS = "domain.value_objects.."
   val FILTERS = "filters.."
-  val GUI = "gui.."
+  val GUI = "controllers.gui.."
   val JAVA = "java.."
   val JAVAX = "jakarta.."
   val MAILJET = "com.mailjet.."
@@ -69,7 +69,7 @@ class DependencyRulesTestSuite extends AnyFunSuite {
       VALIDATORS
     )
   val THE_APP_OUTSIDE_OF_THE_DOMAIN =
-    Seq(/*DEFAULT,*/ API, DEV, FILTERS, GUI, MONGODB_ADAPTER, THIRDPARTY_SERVICES)
+    Seq( /*DEFAULT,*/ API, DEV, FILTERS, GUI, MONGODB_ADAPTER, THIRDPARTY_SERVICES)
 
   val classes =
     new ClassFileImporter().importPackages(THE_APP_OUTSIDE_OF_THE_DOMAIN: _*)

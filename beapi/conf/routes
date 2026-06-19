@@ -1,24 +1,24 @@
 # https://www.playframework.com/documentation/latest/ScalaRouting
 
-GET     /iapi/l10nMessages                       api.I18nController.l10nMessages
-GET     /iapi/timeZones                          api.I18nController.timeZones
+GET     /iapi/l10nMessages                       controllers.api.I18nController.l10nMessages
+GET     /iapi/timeZones                          controllers.api.I18nController.timeZones
 
-GET     /iapi/validations/cellPhoneNumbers       api.ValidationsController.cellPhoneNumbers(cellPhoneNumber: String)
-GET     /iapi/validations/emailAddresses         api.ValidationsController.emailAddresses(emailAddress: String)
-GET     /iapi/validations/urls                   api.ValidationsController.urls(url: String)
+GET     /iapi/validations/cellPhoneNumbers       controllers.api.ValidationsController.cellPhoneNumbers(cellPhoneNumber: String)
+GET     /iapi/validations/emailAddresses         controllers.api.ValidationsController.emailAddresses(emailAddress: String)
+GET     /iapi/validations/urls                   controllers.api.ValidationsController.urls(url: String)
 
-POST    /iapi/elections                          api.ElectionsController.postElection()
+POST    /iapi/elections                          controllers.api.ElectionsController.postElection()
 # cf. "AnyVal wrappers for other supported types" at "https://www.playframework.com/documentation/latest/ScalaRouting#Parameter-types
 # timeZone could also be mapped to a ZoneId by Play: https://www.playframework.com/documentation/latest/ScalaRequestBinders#QueryStringBindable
-GET     /iapi/elections/:election                api.ElectionsController.getElection(election: domain.value_objects.Id, timeZone: Option[String])
-PUT     /iapi/elections/:election/text           api.ElectionsController.putText(election: domain.value_objects.Id)
-PUT     /iapi/elections/:election/nominees       api.ElectionsController.putNominees(election: domain.value_objects.Id)
-PUT     /iapi/elections/:election/visibility     api.ElectionsController.putVisibility(election: domain.value_objects.Id)
-POST    /iapi/elections/:election/reminders      api.ElectionsController.postReminder(election: domain.value_objects.Id)
-PATCH   /iapi/elections/:election/subscriptions  api.ElectionsController.patchSubscriptions(election: domain.value_objects.Id)
-DELETE  /iapi/elections/:election                api.ElectionsController.deleteElection(election: domain.value_objects.Id)
-POST    /iapi/elections/:election/votes          api.ElectionsController.postVote(election: domain.value_objects.Id)
-DELETE  /iapi/elections/:election/votes          api.ElectionsController.deleteVote(election: domain.value_objects.Id, name: String, voted: String)
+GET     /iapi/elections/:election                controllers.api.ElectionsController.getElection(election: domain.value_objects.Id, timeZone: Option[String])
+PUT     /iapi/elections/:election/text           controllers.api.ElectionsController.putText(election: domain.value_objects.Id)
+PUT     /iapi/elections/:election/nominees       controllers.api.ElectionsController.putNominees(election: domain.value_objects.Id)
+PUT     /iapi/elections/:election/visibility     controllers.api.ElectionsController.putVisibility(election: domain.value_objects.Id)
+POST    /iapi/elections/:election/reminders      controllers.api.ElectionsController.postReminder(election: domain.value_objects.Id)
+PATCH   /iapi/elections/:election/subscriptions  controllers.api.ElectionsController.patchSubscriptions(election: domain.value_objects.Id)
+DELETE  /iapi/elections/:election                controllers.api.ElectionsController.deleteElection(election: domain.value_objects.Id)
+POST    /iapi/elections/:election/votes          controllers.api.ElectionsController.postVote(election: domain.value_objects.Id)
+DELETE  /iapi/elections/:election/votes          controllers.api.ElectionsController.deleteVote(election: domain.value_objects.Id, name: String, voted: String)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file                            controllers.Assets.versioned(path="/public", file: Asset)
