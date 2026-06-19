@@ -26,6 +26,6 @@ GET     /assets/*file                            controllers.Assets.versioned(pa
 GET     /browserconfig.xml                       controllers.Assets.at(path="/public/build", file="browserconfig.xml")
 GET     /robots.txt                              controllers.Assets.at(path="/public/build", file="robots.txt")
 
-GET     /                                        gui.ReactController.guiRoute(reactRoute = "")
-GET     /fegui/*reactFile                        gui.ReactController.guiFile(reactFile)
-GET     /*reactRoute                             gui.ReactController.guiRoute(reactRoute)
+GET     /                                        controllers.gui.ReactController.guiRoute(reactRoute = "")
+GET     /fegui/*reactFile                        controllers.gui.ReactController.guiFile(reactFile)
+GET     /*reactRoute                             controllers.gui.ReactController.guiRoute(reactRoute)

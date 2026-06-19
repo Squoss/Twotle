@@ -22,7 +22,7 @@
  * THE SOFTWARE.
  */
 
-package gui
+package controllers.gui
 
 import jakarta.inject.Inject
 import jakarta.inject.Singleton
