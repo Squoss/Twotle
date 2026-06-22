@@ -34,8 +34,8 @@
   <logger name="play" level="INFO" />
   <logger name="Module" level="DEBUG" />
   <logger name="dev" level="INFO" />
-  <logger name="mongodb" level="INFO" />
-  <logger name="thirdparty_services" level="DEBUG" />
+  <logger name="driven_adapters.persistence" level="INFO" />
+  <logger name="driven_adapters.notifications" level="DEBUG" />
 
   <root level="WARN">
     <appender-ref ref="ASYNCFILE" />

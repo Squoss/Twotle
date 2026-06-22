@@ -22,7 +22,7 @@
  * THE SOFTWARE.
  */
 
-package mongodb
+package driven_adapters.persistence
 
 // Replaces the default UuidCodec with one that uses the new standard UUID representation
 // cf. https://mongodb.github.io/mongo-java-driver/4.11/driver-reactive/tutorials/databases-collections/#codecregistry

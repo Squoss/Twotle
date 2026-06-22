@@ -24,15 +24,18 @@
 
 package domain
 
-import dev.{DevEmail, DevRepository, DevSms}
-import domain.services.ElectionsService
+import dev.DevEmail
+import dev.DevRepository
+import dev.DevSms
+import domain.driving_adapters.ElectionsService
 import domain.value_objects.*
 import domain.value_objects.Error.*
 import munit.FunSuite
 
 import java.time.LocalDateTime
 import java.util.UUID
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
 
 class ElectionsServiceTest extends FunSuite {
 

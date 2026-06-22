@@ -34,7 +34,7 @@ class DependencyRulesTestSuite extends FunSuite {
   val ENTITIES = "domain.entities.."
   val NOTIFICATIONS = "domain.driven_ports.notifications.."
   val PERSISTENCE = "domain.driven_ports.persistence.."
-  val SERVICES = "domain.services.."
+  val SERVICES = "domain.driving_adapters.."
   val VALUE_OBJECTS = "domain.value_objects.."
   val JAVA = "java.."
   val JAVAX = "jakarta.."

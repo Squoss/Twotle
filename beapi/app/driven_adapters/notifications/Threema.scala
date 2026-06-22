@@ -22,7 +22,7 @@
  * THE SOFTWARE.
  */
 
-package thirdparty_services
+package driven_adapters.notifications
 
 import com.google.i18n.phonenumbers.PhoneNumberUtil
 import com.google.i18n.phonenumbers.Phonenumber

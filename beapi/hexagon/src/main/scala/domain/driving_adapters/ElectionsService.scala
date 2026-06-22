@@ -22,7 +22,7 @@
  * THE SOFTWARE.
  */
 
-package domain.services
+package domain.driving_adapters
 
 import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber
 import domain.driven_ports.notifications.Email

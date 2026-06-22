@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright (c) 2021-2025 Squeng AG
+ * Copyright (c) 2021-2026 Squeng AG
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,10 +26,10 @@ import com.google.inject.AbstractModule
 import domain.driven_ports.notifications.Email
 import domain.driven_ports.notifications.Sms
 import domain.driven_ports.persistence.Repository
+import domain.driving_adapters.ElectionsService
 import domain.driving_ports.Elections
 import domain.driving_ports.Factory
-import domain.services.ElectionsService
-import mongodb.Mdb
+import driven_adapters.persistence.Mdb
 import play.api.Configuration
 import play.api.Environment
 import play.api.Logging

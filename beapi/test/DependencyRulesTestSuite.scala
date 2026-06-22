@@ -42,7 +42,7 @@ class DependencyRulesTestSuite extends AnyFunSuite {
   val JAVAX = "jakarta.."
   val MAILJET = "com.mailjet.."
   val MONGODB_ADAPTER =
-    "mongodb.." // the MongoDB driver starts its packages with com or org
+    "driven_adapters.persistence.."
   val MONGODB_DRIVER =
     Seq("com.mongodb..", "org.bson..", "org.mongodb..", "org.reactivestreams..")
   val PLAY_API = "play.api.." // "play.." would also include Play's Java API
@@ -52,7 +52,7 @@ class DependencyRulesTestSuite extends AnyFunSuite {
   val ROUTER = "router.."
   val SCALA = "scala.."
   val THIRDPARTY_APIS = "domain.driven_ports.notifications.."
-  val THIRDPARTY_SERVICES = "thirdparty_services.."
+  val THIRDPARTY_SERVICES = "driven_adapters.notifications.."
   val VALIDATORS = "org.apache.commons.validator.."
 
   val NOT_THE_APP =
