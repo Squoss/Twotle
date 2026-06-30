@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Fixadat is a web application inspired by doodle.com and meant as a teaching aid for a textbook. It consists of two subprojects, beapi (short for backend/API) implemented in Scala with Play and fegui (short for frontend/GUI) implemented in TypeScript with React.
+Twotle is a web application inspired by doodle.com and meant as a teaching aid for a textbook. It consists of two subprojects, beapi (short for backend/API) implemented in Scala with Play and fegui (short for frontend/GUI) implemented in TypeScript with React.
 
 ## Tech Stack
 
@@ -28,7 +28,7 @@ Fixadat is a web application inspired by doodle.com and meant as a teaching aid 
 cd beapi
 sbt                                                                         # Start sbt in interactive mode
 run -Dconfig.file=conf/insecureLocalhost.conf                               # Start Play dev server on port 9000 with mock implementations of database, e-mail, and SMS
-run -Dconfig.file=conf/insecureLocalhost.conf -Ddi.db=mongodb.MdbRepository # Start Play dev server on port 9000 with local MongoDB database (mongodb://localhost:27017/fixadat) and mock implementations of e-mail and SMS
+run -Dconfig.file=conf/insecureLocalhost.conf -Ddi.db=mongodb.MdbRepository # Start Play dev server on port 9000 with local MongoDB database (mongodb://localhost:27017/twotle) and mock implementations of e-mail and SMS
 test                                                                        # Run tests (includes ArchUnit dependency rules)
  ```
 
