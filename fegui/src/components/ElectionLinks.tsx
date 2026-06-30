@@ -111,7 +111,7 @@ function ElectionLinks(props: Readonly<ElectionLinksProps>) {
                 <div className="col-auto">
                   <input
                     type="email"
-                    placeholder="yours.truly@fixadat.com"
+                    placeholder="yours.truly@twotle.com"
                     id="emailAddress"
                     className={
                       "form-control" +

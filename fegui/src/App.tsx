@@ -58,7 +58,7 @@ function App(props: {}) {
       <header className="navbar navbar-expand-md navbar-dark fixed-top bg-primary">
         <nav className="container-fluid" aria-label="Main navigation">
           <Link className="navbar-brand" to="/">
-            Fixadat
+            Twotle
           </Link>{" "}
           <a className="navbar-brand" href="https://www.squeng.com/" target="Squeng" rel="noreferrer noopener">
             <small>
@@ -187,7 +187,7 @@ function App(props: {}) {
             &nbsp; &nbsp;
             <a
               className="btn btn-outline-light"
-              href="https://github.com/Squoss/Fixadat"
+              href="https://github.com/Squoss/Twotle"
               target="GitHub"
               rel="noreferrer noopener"
             >
@@ -244,7 +244,7 @@ function App(props: {}) {
             </div>
             <div className="modal-body">
               <p>
-                Being a Web app, Fixadat uses various{" "}
+                Being a Web app, Twotle uses various{" "}
                 <a href="https://developer.mozilla.org/" target="MDN" rel="noreferrer noopener">
                   Web technologies
                 </a>
@@ -271,7 +271,7 @@ function App(props: {}) {
               <div className="collapse" id="cookieConsentCollapse">
                 <div className="card card-body">
                   <p>
-                    For the time being, Fixadat uses two{" "}
+                    For the time being, Twotle uses two{" "}
                     <a
                       href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#define_the_lifetime_of_a_cookie"
                       target="MDN"

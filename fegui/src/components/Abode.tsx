@@ -52,7 +52,7 @@ function Abode(props: {}) {
   return (
     <React.Fragment>
       <div className="border-primary p-5 border rounded">
-        <h1 title="Fix a date & time">Fixadat</h1>
+        <h1 title="Fix a date & time">Twotle</h1>
         <p className="lead">{localizations["executiveSummary"]}</p>
         <button
           type="button"

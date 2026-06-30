@@ -39,17 +39,17 @@ datesAndTimes.duration = Event duration in minutes
 datesAndTimes.durationOptional = This is optional.
 datesAndTimes.instruction = Suggest dates & times for the group event.
 datesAndTimes.timeZone = Time zone
-datesAndTimes.timeZoneMotivation = By providing your time zone, you can let Fixadat worry about conversions if it is not the same for every group member.
+datesAndTimes.timeZoneMotivation = By providing your time zone, you can let Twotle worry about conversions if it is not the same for every group member.
 
 links = Links
 links.voters = Copy the following link and send it to the voters:
 links.organizers = Only share the following link with other organizers:
 links.reminderTo = Send it to yourself by …
 links.byEmail = … e-mail
-links.byEmail.plainText = {1}\nis the Fixadat organizer link for the election {0}.
-links.byEmail.subject = Fixadat organizer link for {0}
+links.byEmail.plainText = {1}\nis the Twotle organizer link for the election {0}.
+links.byEmail.subject = Twotle organizer link for {0}
 links.bySms = … Threema
-links.bySms.text = {1} is the Fixadat organizer link for the election {0}.
+links.bySms.text = {1} is the Twotle organizer link for the election {0}.
 
 settings = Settings
 settings.subscriptions = Receive a notification when a vote is cast (or revoked)

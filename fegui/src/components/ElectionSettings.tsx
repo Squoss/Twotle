@@ -115,7 +115,7 @@ function ElectionSettings(props: Readonly<ElectionSettingsProps>) {
             </h5>
             <input
               type="email"
-              placeholder="yours.truly@fixadat.com"
+              placeholder="yours.truly@twotle.com"
               id="emailAddress"
               className={
                 "form-control" +

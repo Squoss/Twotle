@@ -39,17 +39,17 @@ datesAndTimes.duration = Dauer des Anlasses in Minuten
 datesAndTimes.durationOptional = Dies ist optional.
 datesAndTimes.instruction = Schlagen Sie Daten & Zeiten für den Gruppenanlass vor.
 datesAndTimes.timeZone = Zeitzone
-datesAndTimes.timeZoneMotivation = Durch Angabe Ihrer Zeitzone können Sie Umrechnungen Fixadat überlassen, falls sie nicht dieselbe für jedes Gruppenmitglied ist.
+datesAndTimes.timeZoneMotivation = Durch Angabe Ihrer Zeitzone können Sie Umrechnungen Twotle überlassen, falls sie nicht dieselbe für jedes Gruppenmitglied ist.
 
 links = Links
 links.voters = Kopieren Sie den folgenden Link und senden Sie ihn den Wählern:
 links.organizers = Teilen Sie den folgenden Link nur mit weiteren Organisatoren:
 links.reminderTo = Schicken Sie ihn sich selbst per …
 links.byEmail = … E-Mail
-links.byEmail.plainText = {1}\nist der Fixadat-Organisator-Link für die Wahl {0}.
-links.byEmail.subject = Fixadat-Organisator-Link für {0}
+links.byEmail.plainText = {1}\nist der Twotle-Organisator-Link für die Wahl {0}.
+links.byEmail.subject = Twotle-Organisator-Link für {0}
 links.bySms = … Threema
-links.bySms.text = {1} ist der Fixadat-Organisator-Link für die Wahl {0}.
+links.bySms.text = {1} ist der Twotle-Organisator-Link für die Wahl {0}.
 
 settings = Einstellungen
 settings.subscriptions = Erhalten Sie eine Mitteilung, wenn eine Stimme abgegeben (oder annuliert) wurde

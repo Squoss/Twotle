@@ -1,4 +1,4 @@
-name := "Fixadat"
+name := "Twotle"
 
 version := "ToBeDetermined"
 
@@ -6,7 +6,7 @@ organization := "com.squeng"
 organizationName := "Squeng AG"
 organizationHomepage := Some(url("https://www.squeng.com/"))
 
-homepage := Some(url("https://fixadat.com"))
+homepage := Some(url("https://twotle.com"))
 startYear := Some(2021)
 description := "a tip of the hat to classic Doodle"
 licenses += "MIT" -> url("https://choosealicense.com/licenses/mit/")

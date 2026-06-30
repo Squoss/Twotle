@@ -79,7 +79,7 @@ class Mailjet @Inject() (implicit
         Json.obj(
           "From" -> Json.obj(
             "Email" -> sender,
-            "Name" -> "Fixadat"
+            "Name" -> "Twotle"
           ),
           "To" -> Json.arr(
             Json.obj(
@@ -116,7 +116,7 @@ class Mailjet @Inject() (implicit
     logger.debug(s"trying to send to $to via Mailjet")
 
     val data = Json.obj(
-      "From" -> "Fixadat",
+      "From" -> "Twotle",
       "To" -> PhoneNumberUtil
         .getInstance()
         .format(to, PhoneNumberUtil.PhoneNumberFormat.E164),

@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright (c) 2021-2025 Squeng AG
+ * Copyright (c) 2021-2026 Squeng AG
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -31,7 +31,7 @@ function Masthead(props: {}) {
     <React.Fragment>
       <h1>Impressum</h1>
       <p>
-        Fixadat ist eine Anwendung der Squeng AG, auf{" "}
+        Twotle ist eine Anwendung der Squeng AG, auf{" "}
         <a
           href="https://www.squeng.com/impressum"
           target="Squeng" rel="noreferrer noopener"

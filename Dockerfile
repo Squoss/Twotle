@@ -5,7 +5,7 @@
 
 FROM node:24 AS react
 
-WORKDIR /squeng/fixadat
+WORKDIR /squeng/twotle
 
 COPY fegui/.env ./
 # COPY fegui/.npmrc ./
@@ -24,7 +24,7 @@ RUN npm run build
 
 FROM sbtscala/scala-sbt:eclipse-temurin-25.0.3_9_1.12.13_3.3.8 AS play
 
-WORKDIR /squeng/fixadat
+WORKDIR /squeng/twotle
 
 COPY beapi/app ./app
 COPY beapi/conf ./conf
@@ -32,18 +32,18 @@ COPY beapi/project ./project
 COPY beapi/public ./public
 COPY beapi/hexagon ./hexagon
 COPY beapi/build.sbt ./
-COPY --from=react /squeng/fixadat/build ./public/build
+COPY --from=react /squeng/twotle/build ./public/build
 RUN sbt stage
 
 
 FROM eclipse-temurin:25-jre
 
-WORKDIR /squeng/fixadat
+WORKDIR /squeng/twotle
 
-COPY --from=play /squeng/fixadat/target/universal/stage ./target/universal/stage
+COPY --from=play /squeng/twotle/target/universal/stage ./target/universal/stage
 
 RUN groupadd -r gruppe && useradd --no-log-init -r -g gruppe benutzer && chown -R benutzer:gruppe /squeng
 USER benutzer
 
 EXPOSE 8080
-CMD ["target/universal/stage/bin/fixadat", "-Dpidfile.path=play.pid", "-Dhttp.port=8080"]
+CMD ["target/universal/stage/bin/twotle", "-Dpidfile.path=play.pid", "-Dhttp.port=8080"]

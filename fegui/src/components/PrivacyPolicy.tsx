@@ -138,12 +138,13 @@ function PrivacyPolicy(props: {}) {
       <p>
         Squeng AG
         <br />
-        Lagerstrasse 4<br />
-        9200 Gossau
+        Switzerland Innovation Park Ost<br />
+        Lerchenfeldstrasse 3<br />
+        9014 St.Gallen
         <br />
         Schweiz
       </p>
-      <p>E-Mail: fixadat@squeng.com</p>
+      <p>E-Mail: twotle@squeng.com</p>
       <p>
         Verantwortliche Stelle ist die nat&uuml;rliche oder juristische Person, die allein oder gemeinsam mit anderen
         &uuml;ber die Zwecke und Mittel der Verarbeitung von personenbezogenen Daten (z.&nbsp;B. Namen, E-Mail-Adressen
