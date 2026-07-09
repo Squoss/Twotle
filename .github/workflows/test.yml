@@ -6,33 +6,41 @@ on:
   pull_request:
     branches: [ main ]
 
+permissions:
+  contents: read
+
+concurrency:
+  group: test-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
 jobs:
-#  npm:
-#    runs-on: ubuntu-latest
-#    steps:
-#    - uses: actions/checkout@v6
-#    - name: Set up Node.js 24
-#      uses: actions/setup-node@v6
-#      with:
-#        node-version: '24'
-#        cache: 'npm'
-#        cache-dependency-path: fegui/package-lock.json
-#    - name: Clean install with npm
-#      run: npm ci
-#      working-directory: fegui
-#    - name: Test with npm
-#      run: npm test
-#      working-directory: fegui
+  npm:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+    - name: Set up Node.js 24
+      uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+      with:
+        node-version: '24'
+        cache: 'npm'
+        cache-dependency-path: fegui/package-lock.json
+    - name: Clean install with npm
+      run: npm ci
+      working-directory: fegui
+    - name: Typecheck with tsc
+      run: npm run typecheck
+      working-directory: fegui
+    # no `npm test` step: fegui has no test suite yet
   sbt:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
     - name: Set up JDK 25
-      uses: actions/setup-java@v5
+      uses: actions/setup-java@0f481fcb613427c0f801b606911222b5b6f3083a # v5.5.0
       with:
         distribution: 'temurin'
         java-version: '25'
-    - uses: sbt/setup-sbt@v1
+    - uses: sbt/setup-sbt@66fb4376e81982c7d92a4074170846fff88e2e30 # v1.5.0
     - name: Test with sbt
       run: sbt test
       working-directory: beapi

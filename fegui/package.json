@@ -22,8 +22,9 @@
   },
   "scripts": {
     "start": "vite",
-    "build": "vite build",
-    "serve": "vite preview"
+    "build": "tsc -b && vite build",
+    "serve": "vite preview",
+    "typecheck": "tsc -b"
   },
   "eslintConfig": {
     "extends": [

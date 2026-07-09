@@ -2,27 +2,37 @@ name: Scan
 
 on:
   workflow_run:
+    branches: [ main ]
     workflows: ["Test"]
     types: [completed]
   schedule:
     - cron: '0 12 * * 0'
 
+permissions:
+  contents: read
+
+concurrency:
+  group: scan-${{ github.event.workflow_run.head_branch || 'schedule' }}
+  cancel-in-progress: true
+
 jobs:
   Sonar:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     if: ${{ github.event_name == 'schedule' || github.event.workflow_run.conclusion == 'success' }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
         # Disabling shallow clone is recommended for improving relevancy of reporting
           fetch-depth: 0
       - name: back-end and front-end
-        uses: SonarSource/sonarqube-scan-action@v8
+        uses: SonarSource/sonarqube-scan-action@713881670b6b3676cda39549040e2d88c70d582e # v8.2.0
         with:
           # https://docs.sonarcloud.io/advanced-setup/analysis-scope/#restrict-the-scope-of-analysis-in-general
           args: >
             -Dsonar.organization=squoss
-            -Dsonar.projectKey=Squoss_Squawg
+            -Dsonar.projectKey=Squoss_Twotle
             -Dsonar.sources=beapi/app/,beapi/hexagon/src/main/scala/,fegui/src/
             -Dsonar.tests=beapi/test/,beapi/hexagon/src/test/scala/
 #            -Dsonar.exclusions=fegui/src/__tests__/**/*
@@ -32,10 +42,13 @@ jobs:
   update-graph:
     # https://www.scala-lang.org/blog/2022/07/18/secure-your-dependencies-on-github.html
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    if: ${{ github.event_name == 'schedule' || github.event.workflow_run.conclusion == 'success' }}
     steps:
-      - uses: actions/checkout@v6
-      - uses: sbt/setup-sbt@v1
-      - uses: scalacenter/sbt-dependency-submission@v3
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: sbt/setup-sbt@66fb4376e81982c7d92a4074170846fff88e2e30 # v1.5.0
+      - uses: scalacenter/sbt-dependency-submission@d84eef4c09e633bcf5f113bcad7fd5e9af1baee9 # v3.2.3
         with:
           ## Optional: Define the working directory of your build.
           ## It should contain the build.sbt file.

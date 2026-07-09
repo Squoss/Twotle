@@ -17,6 +17,7 @@ COPY fegui/index.html ./
 COPY fegui/public ./public
 COPY fegui/src ./src
 COPY fegui/tsconfig.json ./
+COPY fegui/tsconfig.app.json ./
 COPY fegui/tsconfig.node.json ./
 COPY fegui/vite.config.ts ./
 RUN npm run build
