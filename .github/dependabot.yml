@@ -23,3 +23,7 @@ updates:
     groups:
       docker:
         patterns: [ "*" ]
+    ignore:
+      # pinned to the Node 24 LTS line on purpose; bump major versions manually
+      - dependency-name: "node"
+        update-types: [ "version-update:semver-major" ]
