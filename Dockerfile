@@ -3,7 +3,7 @@
 # https://nodejs.org/en/docs/guides/nodejs-docker-webapp/
 
 
-FROM node:24 AS react
+FROM node:26 AS react
 
 WORKDIR /squeng/twotle
 
