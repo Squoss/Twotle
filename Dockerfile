@@ -10,12 +10,15 @@ WORKDIR /squeng/twotle
 COPY fegui/.env ./
 # COPY fegui/.npmrc ./
 COPY fegui/package*.json ./
+COPY fegui/hexagon/package.json ./hexagon/
 # https://docs.npmjs.com/cli/v10/commands/npm-ci
 RUN npm ci
 
 COPY fegui/index.html ./
 COPY fegui/public ./public
 COPY fegui/src ./src
+COPY fegui/hexagon/src ./hexagon/src
+COPY fegui/hexagon/tsconfig.json ./hexagon/
 COPY fegui/tsconfig.json ./
 COPY fegui/tsconfig.app.json ./
 COPY fegui/tsconfig.node.json ./

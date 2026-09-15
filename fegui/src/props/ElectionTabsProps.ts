@@ -22,7 +22,7 @@
  * THE SOFTWARE.
  */
 
-import { ElectionEntity } from "../entities/ElectionEntity";
+import { ElectionEntity } from "@twotle/hexagon";
 
 export enum ACTIVE_TAB {
   TEXTS = "name and description",

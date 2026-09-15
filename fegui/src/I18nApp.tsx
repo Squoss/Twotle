@@ -23,7 +23,7 @@
  */
 
 import React, { useEffect, useState } from "react";
-import { fetchResource, Method } from "./fetchJson";
+import { getLocalizations } from "./fetchLookups";
 import { l10nContext, Localizations } from "./l10nContext";
 
 interface I18nAppProperties {
@@ -36,18 +36,9 @@ function I18nApp(props: Readonly<I18nAppProperties>) {
   const [localizations, setLocalizations] = useState<Localizations>({});
 
   useEffect(() => {
-    const fetchLocalizations = () =>
-      fetchResource<Localizations>(Method.Get, "/iapi/l10nMessages")
-        .then((response) => {
-          if (response.status === 200) {
-            setLocalizations(response.parsedBody!);
-          } else {
-            throw new Error(`HTTP status ${response.status} instead of 200`);
-          }
-        })
-        .catch((error) => console.error(`failed to get localizations: ${error}`));
-
-    fetchLocalizations();
+    getLocalizations()
+      .then((localizations) => setLocalizations(localizations))
+      .catch((error) => console.error(`failed to get localizations: ${error}`));
   }, []);
 
   return (

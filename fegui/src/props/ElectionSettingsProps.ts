@@ -22,7 +22,7 @@
  * THE SOFTWARE.
  */
 
-import { ElectionEntity } from "../entities/ElectionEntity";
+import { ElectionEntity } from "@twotle/hexagon";
 
 export interface ElectionSettingsProps {
   election: ElectionEntity;

@@ -23,6 +23,6 @@
  */
 
 import React from "react";
-import { ElectionAntiFactory } from "./driving_ports/ElectionAntiFactory";
+import { ElectionAntiFactory } from "@twotle/hexagon";
 
 export const antiFactoryContext = React.createContext<ElectionAntiFactory | null>(null);

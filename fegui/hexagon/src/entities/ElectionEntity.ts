@@ -101,6 +101,10 @@ export class ElectionEntity {
       .then(() => this.with({}));
   }
 
+  sendLinksReminder(emailAddress?: string, phoneNumber?: string): Promise<void> {
+    return this.repository.postReminder(String(this.id), this.organizerToken, emailAddress, phoneNumber);
+  }
+
   castVote(token: string, name: string, availability: Map<string, Availability>, timeZone?: string): Promise<ElectionEntity> {
     return this.repository.postVote(String(this.id), token, name, availability, timeZone)
       .then(() => this.repository.getElection(String(this.id), token, this.timeZone ?? Intl.DateTimeFormat().resolvedOptions().timeZone));

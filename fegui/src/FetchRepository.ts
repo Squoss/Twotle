@@ -22,12 +22,34 @@
  * THE SOFTWARE.
  */
 
-import { Repository } from "./driven_ports/Repository";
-import { ElectionData, ElectionEntity } from "./entities/ElectionEntity";
+import {
+  ElectionData,
+  ElectionEntity,
+  ElectionError,
+  ElectionErrorReason,
+  PostElectionResponse,
+  Repository,
+  Visibility,
+} from "@twotle/hexagon";
 import { fetchResource, Method } from "./fetchJson";
-import { HttpError } from "./HttpError";
-import { PostElectionResponse } from "./value_objects/PostElectionResponse";
-import { Visibility } from "./value_objects/Visibility";
+
+// the inverse of beapi's ElectionsController.toErrorResponse
+function toElectionError(status: number): ElectionError {
+  switch (status) {
+    case 400:
+      return new ElectionError(ElectionErrorReason.COMMANDINCOMPLETE);
+    case 403:
+      return new ElectionError(ElectionErrorReason.ACCESSDENIED);
+    case 404:
+      return new ElectionError(ElectionErrorReason.NOTFOUND);
+    case 409:
+      return new ElectionError(ElectionErrorReason.PROTECTEDACCESS);
+    case 410:
+      return new ElectionError(ElectionErrorReason.PRIVATEACCESS);
+    default:
+      return new ElectionError(ElectionErrorReason.UNEXPECTED);
+  }
+}
 
 export class FetchRepository implements Repository {
   postElection = (): Promise<PostElectionResponse> =>
@@ -47,7 +69,7 @@ export class FetchRepository implements Repository {
       token
     ).then((response) => {
       if (!response.ok) {
-        throw new HttpError(response.status);
+        throw toElectionError(response.status);
       }
       return new ElectionEntity(this, response.parsedBody!);
     });
@@ -58,7 +80,7 @@ export class FetchRepository implements Repository {
       description,
     }).then((response) => {
       if (response.status !== 204) {
-        throw new HttpError(response.status);
+        throw toElectionError(response.status);
       }
     });
 
@@ -68,7 +90,7 @@ export class FetchRepository implements Repository {
       timeZone,
     }).then((response) => {
       if (response.status !== 204) {
-        throw new HttpError(response.status);
+        throw toElectionError(response.status);
       }
     });
 
@@ -78,7 +100,7 @@ export class FetchRepository implements Repository {
       phoneNumber,
     }).then((response) => {
       if (response.status !== 204) {
-        throw new HttpError(response.status);
+        throw toElectionError(response.status);
       }
     });
 
@@ -87,7 +109,17 @@ export class FetchRepository implements Repository {
       visibility,
     }).then((response) => {
       if (response.status !== 204) {
-        throw new HttpError(response.status);
+        throw toElectionError(response.status);
+      }
+    });
+
+  postReminder = (id: string, token: string, emailAddress?: string, phoneNumber?: string): Promise<void> =>
+    fetchResource(Method.Post, `/iapi/elections/${id}/reminders`, token, {
+      emailAddress,
+      phoneNumber,
+    }).then((response) => {
+      if (response.status !== 204) {
+        throw toElectionError(response.status);
       }
     });
 
@@ -98,7 +130,7 @@ export class FetchRepository implements Repository {
       availability: Object.fromEntries(availability),
     }).then((response) => {
       if (response.status !== 204) {
-        throw new HttpError(response.status);
+        throw toElectionError(response.status);
       }
     });
 
@@ -106,7 +138,7 @@ export class FetchRepository implements Repository {
     fetchResource<void>(Method.Delete, `/iapi/elections/${id}/votes?name=${name}&voted=${voted}`, token)
       .then((response) => {
         if (response.status !== 204) {
-          throw new HttpError(response.status);
+          throw toElectionError(response.status);
         }
       });
 
@@ -114,7 +146,7 @@ export class FetchRepository implements Repository {
     fetchResource<void>(Method.Delete, `/iapi/elections/${id}`, token)
       .then((response) => {
         if (response.status !== 204) {
-          throw new HttpError(response.status);
+          throw toElectionError(response.status);
         }
       });
 }

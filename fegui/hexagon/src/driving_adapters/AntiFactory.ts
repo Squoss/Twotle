@@ -22,8 +22,8 @@
  * THE SOFTWARE.
  */
 
-import { Repository } from "./driven_ports/Repository";
-import { ElectionAntiFactory } from "./driving_ports/ElectionAntiFactory";
+import { Repository } from "../driven_ports/Repository";
+import { ElectionAntiFactory } from "../driving_ports/ElectionAntiFactory";
 
 export class AntiFactory implements ElectionAntiFactory {
   constructor(private readonly repository: Repository) {}

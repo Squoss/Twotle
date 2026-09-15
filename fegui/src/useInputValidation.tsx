@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright (c) 2021-2023 Squeng AG
+ * Copyright (c) 2021-2026 Squeng AG
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,16 +23,11 @@
  */
 
 import { useEffect, useRef, useState } from "react";
-import { fetchResource, Method } from "./fetchJson";
+import { isValidCellPhoneNumber, isValidEmailAddress } from "./fetchLookups";
 
 export enum InputType {
-  CELLPHONENUMBER = "cellPhoneNumbers?cellPhoneNumber",
-  EMAILADDRESS = "emailAddresses?emailAddress",
-}
-
-interface ValidityType {
-  value: string;
-  valid: boolean;
+  CELLPHONENUMBER = "cellPhoneNumber",
+  EMAILADDRESS = "emailAddress",
 }
 
 export type InputValidationTriple = [
@@ -55,18 +50,13 @@ function useInputValidation(inputType: InputType, inputValue: string) {
   const debounceRef = useRef<any>(null);
 
   useEffect(() => {
+    const isValid =
+      inputType === InputType.CELLPHONENUMBER
+        ? isValidCellPhoneNumber
+        : isValidEmailAddress;
     const getValidity = () =>
-      fetchResource<ValidityType>(
-        Method.Get,
-        `/iapi/validations/${inputType}=${potentiallyInvalidValue}`
-      )
-        .then((response) => {
-          if (response.status === 200) {
-            setValueValid(response.parsedBody!.valid);
-          } else {
-            throw new Error(`HTTP status ${response.status} instead of 200`);
-          }
-        })
+      isValid(potentiallyInvalidValue)
+        .then((valid) => setValueValid(valid))
         .catch((error) => console.error(`failed to get validity: ${error}`));
 
     if (debounceRef.current) {

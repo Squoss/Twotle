@@ -23,6 +23,6 @@
  */
 
 import React from "react";
-import { ElectionFactory } from "./driving_ports/ElectionFactory";
+import { ElectionFactory } from "@twotle/hexagon";
 
 export const factoryContext = React.createContext<ElectionFactory | null>(null);

@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright (c) 2021-2026 Squeng AG
+ * Copyright (c) 2026 Squeng AG
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,8 +22,18 @@
  * THE SOFTWARE.
  */
 
-export class HttpError extends Error {
-  constructor(public readonly status: number) {
-    super(`HTTP status ${status}`);
+// cf. beapi's domain.value_objects.Error
+export enum ElectionErrorReason {
+  NOTFOUND = "NotFound",
+  ACCESSDENIED = "AccessDenied",
+  PRIVATEACCESS = "PrivateAccess",
+  PROTECTEDACCESS = "ProtectedAccess",
+  COMMANDINCOMPLETE = "CommandIncomplete",
+  UNEXPECTED = "Unexpected",
+}
+
+export class ElectionError extends Error {
+  constructor(public readonly reason: ElectionErrorReason) {
+    super(reason);
   }
 }

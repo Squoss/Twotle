@@ -22,10 +22,10 @@
  * THE SOFTWARE.
  */
 
-import { Repository } from "./driven_ports/Repository";
-import { ElectionEntity } from "./entities/ElectionEntity";
-import { ElectionFactory } from "./driving_ports/ElectionFactory";
-import { PostElectionResponse } from "./value_objects/PostElectionResponse";
+import { Repository } from "../driven_ports/Repository";
+import { ElectionEntity } from "../entities/ElectionEntity";
+import { ElectionFactory } from "../driving_ports/ElectionFactory";
+import { PostElectionResponse } from "../value_objects/PostElectionResponse";
 
 export class Factory implements ElectionFactory {
   constructor(private readonly repository: Repository) {}

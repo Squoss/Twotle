@@ -23,8 +23,7 @@
  */
 
 import React, { useContext, useState } from "react";
-import { Availability } from "../value_objects/Availability";
-import { Visibility } from "../value_objects/Visibility";
+import { Availability, Visibility } from "@twotle/hexagon";
 import { l10nContext } from "../l10nContext";
 import { ElectionVoteProps } from "../props/ElectionVoteProps";
 

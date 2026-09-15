@@ -33,6 +33,7 @@ export interface Repository {
   putElectionSchedule: (id: string, token: string, candidates: Array<string>, timeZone?: string) => Promise<void>;
   patchElectionSubscriptions: (id: string, token: string, emailAddress?: string, phoneNumber?: string) => Promise<void>;
   putElectionVisibility: (id: string, token: string, visibility: Visibility) => Promise<void>;
+  postReminder: (id: string, token: string, emailAddress?: string, phoneNumber?: string) => Promise<void>;
   postVote: (id: string, token: string, name: string, availability: Map<string, string>, timeZone?: string) => Promise<void>;
   deleteVote: (id: string, token: string, name: string, voted: Date) => Promise<void>;
   deleteElection: (id: string, token: string) => Promise<void>;

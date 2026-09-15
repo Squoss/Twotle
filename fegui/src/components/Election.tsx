@@ -24,11 +24,10 @@
 
 import React, { useCallback, useContext, useEffect, useState } from "react";
 import { Navigate, Outlet, Route, Routes, useLocation, useParams, useSearchParams } from "react-router-dom";
-import { ElectionEntity } from "../entities/ElectionEntity";
-import { HttpError } from "../HttpError";
+import { ElectionEntity, ElectionError, ElectionErrorReason } from "@twotle/hexagon";
 import ElectionTabs from "./ElectionTabs";
 import { ACTIVE_TAB } from "../props/ElectionTabsProps";
-import { fetchResource, Method } from "../fetchJson";
+import { getTimeZones } from "../fetchLookups";
 import NotFound from "./NotFound";
 import { factoryContext } from "../factoryContext";
 
@@ -44,7 +43,7 @@ function Election(props: {}) {
   const tz = searchParams.get("timeZone");
 
   const [election, setElection] = useState<ElectionEntity | undefined>(undefined);
-  const [responseStatusCode, setResponseStatusCode] = useState<number>(200);
+  const [electionErrorReason, setElectionErrorReason] = useState<ElectionErrorReason | undefined>(undefined);
   const [timeZones, setTimeZones] = useState<Array<string>>([]);
 
   const getElection = useCallback(() => {
@@ -55,12 +54,12 @@ function Election(props: {}) {
     factory
       .recreateElection(id, token.substring(1), tz ?? Intl.DateTimeFormat().resolvedOptions().timeZone)
       .then((election) => {
-        setResponseStatusCode(200);
+        setElectionErrorReason(undefined);
         setElection(election);
       })
       .catch((error) => {
-        if (error instanceof HttpError) {
-          setResponseStatusCode(error.status);
+        if (error instanceof ElectionError) {
+          setElectionErrorReason(error.reason);
         }
         console.error(`failed to get election: ${error}`);
       });
@@ -71,57 +70,41 @@ function Election(props: {}) {
   }, [getElection]);
 
   useEffect(() => {
-    const getTimeZones = () =>
-      fetchResource<Array<string>>(Method.Get, "/iapi/timeZones")
-        .then((response) => {
-          if (response.status === 200) {
-            setTimeZones(response.parsedBody!);
-          } else {
-            throw new Error(`HTTP status ${response.status} instead of 200`);
-          }
-        })
-        .catch((error) => console.error(`failed to get time zones: ${error}`));
-
-    getTimeZones();
+    getTimeZones()
+      .then((timeZones) => setTimeZones(timeZones))
+      .catch((error) => console.error(`failed to get time zones: ${error}`));
   }, []);
 
   const sendLinksReminder = (emailAddress?: string, phoneNumber?: string) =>
-    fetchResource(Method.Post, `/iapi/elections/${id}/reminders`, token.substring(1), {
-      emailAddress,
-      phoneNumber,
-    })
-      .then((response) => {
-        if (response.status !== 204) {
-          throw new Error(`HTTP status ${response.status} instead of 204`);
-        }
-      })
+    election
+      ?.sendLinksReminder(emailAddress, phoneNumber)
       .catch((error) => console.error(`failed to post election reminders: ${error}`));
 
   const onElectionDeleted = () => {
     setElection(undefined);
-    setResponseStatusCode(404);
+    setElectionErrorReason(ElectionErrorReason.NOTFOUND);
   };
 
   if (token === "") {
     return <p>Dude, where's my token?!</p>;
   }
 
-  if (election === undefined && responseStatusCode === 200) {
+  if (election === undefined && electionErrorReason === undefined) {
     return (
       <output className="spinner-border">
         <span className="visually-hidden">Loading election …</span>
       </output>
     );
-  } else if (responseStatusCode !== 200) {
-    switch (responseStatusCode) {
-      case 403:
+  } else if (electionErrorReason !== undefined) {
+    switch (electionErrorReason) {
+      case ElectionErrorReason.ACCESSDENIED:
         return <p>Forbidden</p>;
-      case 404:
+      case ElectionErrorReason.NOTFOUND:
         return <p>Not Found</p>;
-      case 410:
+      case ElectionErrorReason.PRIVATEACCESS:
         return <p>Gone</p>;
       default:
-        return <p>{responseStatusCode}</p>;
+        return <p>{electionErrorReason}</p>;
     }
   } else if (election) {
     return (
@@ -229,7 +212,7 @@ function Election(props: {}) {
       <dl>
         <dt>assert false</dt>
         <dd>
-          election is {election} and responseStatusCode is {responseStatusCode}
+          election is {election} and electionErrorReason is {electionErrorReason}
         </dd>
       </dl>
     );

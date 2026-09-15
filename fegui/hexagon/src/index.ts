@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright (c) 2021-2026 Squeng AG
+ * Copyright (c) 2026 Squeng AG
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,10 +22,15 @@
  * THE SOFTWARE.
  */
 
-import { ElectionEntity } from "@twotle/hexagon";
-
-export interface ElectionVoteProps {
-  election: ElectionEntity;
-  token: string;
-  onElectionChanged: (election: ElectionEntity) => void;
-}
+export * from "./driven_ports/Repository";
+export * from "./driving_adapters/AntiFactory";
+export * from "./driving_adapters/Factory";
+export * from "./driving_ports/ElectionAntiFactory";
+export * from "./driving_ports/ElectionFactory";
+export * from "./entities/ElectionEntity";
+export * from "./value_objects/Availability";
+export * from "./value_objects/ElectionError";
+export * from "./value_objects/PostElectionResponse";
+export * from "./value_objects/SubscriptionChannels";
+export * from "./value_objects/Visibility";
+export * from "./value_objects/Vote";

@@ -23,7 +23,7 @@
  */
 
 import React, { useContext } from "react";
-import { Vote } from "../value_objects/Vote";
+import { Vote } from "@twotle/hexagon";
 import ElectionVote from "./ElectionVote";
 import { l10nContext } from "../l10nContext";
 import { ElectionTallyProps } from "../props/ElectionTallyProps";

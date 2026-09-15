@@ -1,0 +1,8 @@
+{
+    "name": "@twotle/hexagon",
+    "version": "2.0.0",
+    "private": true,
+    "exports": {
+        ".": "./src/index.ts"
+    }
+}

@@ -25,7 +25,7 @@
 import { Modal } from "bootstrap";
 import React, { useContext, useState } from "react";
 import { antiFactoryContext } from "../antiFactoryContext";
-import { Visibility } from "../value_objects/Visibility";
+import { Visibility } from "@twotle/hexagon";
 import { l10nContext } from "../l10nContext";
 import { ElectionSettingsProps } from "../props/ElectionSettingsProps";
 import useInputValidation, { InputType } from "../useInputValidation";

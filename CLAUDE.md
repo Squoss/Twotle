@@ -13,9 +13,9 @@ Twotle is a web application inspired by doodle.com and meant as a teaching aid f
 - DBMS: MongoDB
 - Auth: Capability URLs (https://www.w3.org/TR/capability-urls/)
 
-## Weird Stuff You Should Know
+## Work in Progress
 
-- For teaching purposes, the backend (which used to feature an API only) is going to feature GUI parts implemented in Play's Twirl both with and without htmx.
+- Retrofitting fegui as a React Router v8 framework-mode SPA with its hexagon as an npm workspace package (`fegui/hexagon`). As of 2026-09-15, Stage 1 (the hexagon package) is done except for dependency-cruiser, which waits for TypeScript 7.1; Stage 2 is next. See [PLAN.md](PLAN.md) for the staged plan, decisions, risks, and verification steps.
 
 ## Conventions
 
@@ -70,7 +70,7 @@ beapi/
 │       │   ├── persistence/  # Repository, Events
 │       │   └── notifications/# Email, Sms
 │       ├── entities/         # ElectionEntity
-│       ├── services/         # ElectionsService
+│       ├── driving_adapters/ # ElectionsService
 │       └── value_objects/    # Id, AccessToken, EmailAddress, Vote, etc.
 └── conf/
     ├── routes                # Play routing
@@ -93,7 +93,26 @@ React SPA with React Router.
 
 Internationalization/Localization (cf. `l10nContext.tsx`) is based on the backend (i.e., on Play's i18n/l10n support).
 
-Organized along the lines of the Ports & Adapters pattern (Hexagonal architecture).
+Organized along the lines of the Ports & Adapters pattern (Hexagonal architecture), mirroring the backend:
+
+```
+fegui/
+├── src/
+│   ├── components/, props/   # React GUI (driving adapters)
+│   ├── FetchRepository.ts    # REST adapter for the Repository port (driven adapter)
+│   ├── fetchLookups.ts       # Localizations, time zones, validations (bypass the hexagon, like beapi's I18nController/ValidationsController)
+│   ├── fetchJson.ts          # Used by the two fetch adapters only
+│   └── index.tsx             # Composition root (wires FetchRepository into Factory/AntiFactory via React contexts)
+└── hexagon/                  # Domain core (npm workspace package @twotle/hexagon, no DOM lib)
+    └── src/
+        ├── driving_ports/    # ElectionFactory, ElectionAntiFactory
+        ├── driven_ports/     # Repository
+        ├── entities/         # ElectionEntity
+        ├── driving_adapters/ # Factory, AntiFactory
+        └── value_objects/    # Availability, ElectionError, Visibility, Vote, etc.
+```
+
+Import the hexagon via `@twotle/hexagon` (the `hexagon/src/index.ts` barrel), never via relative paths. Nothing enforces the frontend dependency rules yet (dependency-cruiser waits for TypeScript 7.1); `npm run typecheck` only keeps DOM APIs out of the hexagon.
 
 ## API Routes
 
