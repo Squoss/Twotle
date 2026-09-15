@@ -1,6 +1,6 @@
 # fegui: frontend hexagon as a subproject + retrofit to React Router v8 framework mode
 
-> **Status (2026-09-15):** Stage 1 done and staged (not yet committed), except dependency-cruiser, which waits for TypeScript 7.1 (see Stage 1). Next step: Stage 2.
+> **Status (2026-09-15):** Stage 1 done and committed (`31e3c18`), except dependency-cruiser, which waits for TypeScript 7.1 (see Stage 1). Next step: Stage 2.
 
 ## Context
 
@@ -149,7 +149,6 @@ Stage 2 alone already removes the patchwork. Stage 3 is what makes it "elegant".
 - **Build-time prerender imports route modules in Node.** `import { Modal } from "bootstrap"` in `root`/`Abode` may touch `window`/`document`. If so, switch to a dynamic `import("bootstrap")` inside effects/handlers.
 - **`base: "/fegui/"` vs. router `basename: "/"`:** confirm that asset URLs in the prerendered `index.html` resolve under `/fegui/` and that the Play `/*reactRoute` fallback still wins for app URLs.
 - **Workspace hoisting:** until dependency-cruiser runs, nothing stops the hexagon from importing React.
-- **Pre-existing, unchanged in Stage 1:** `fetchLookups` doesn't URL-encode the values it validates, so a `+` in a phone number or e-mail address arrives at Play as a space.
 
 ## Critical files
 

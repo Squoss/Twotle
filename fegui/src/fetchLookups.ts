@@ -45,8 +45,9 @@ export const getLocalizations = (): Promise<Record<string, string>> =>
 export const getTimeZones = (): Promise<Array<string>> =>
   get<Array<string>>("/iapi/timeZones");
 
+// URLSearchParams encodes e.g. "+", which would otherwise arrive as a space
 export const isValidCellPhoneNumber = (cellPhoneNumber: string): Promise<boolean> =>
-  get<Validity>(`/iapi/validations/cellPhoneNumbers?cellPhoneNumber=${cellPhoneNumber}`).then((validity) => validity.valid);
+  get<Validity>(`/iapi/validations/cellPhoneNumbers?${new URLSearchParams({ cellPhoneNumber })}`).then((validity) => validity.valid);
 
 export const isValidEmailAddress = (emailAddress: string): Promise<boolean> =>
-  get<Validity>(`/iapi/validations/emailAddresses?emailAddress=${emailAddress}`).then((validity) => validity.valid);
+  get<Validity>(`/iapi/validations/emailAddresses?${new URLSearchParams({ emailAddress })}`).then((validity) => validity.valid);

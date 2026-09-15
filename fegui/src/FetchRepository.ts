@@ -65,7 +65,7 @@ export class FetchRepository implements Repository {
   getElection = (id: string, token: string, timeZone: string): Promise<ElectionEntity> =>
     fetchResource<ElectionData>(
       Method.Get,
-      `/iapi/elections/${id}?timeZone=${timeZone}`,
+      `/iapi/elections/${id}?${new URLSearchParams({ timeZone })}`,
       token
     ).then((response) => {
       if (!response.ok) {
@@ -135,7 +135,7 @@ export class FetchRepository implements Repository {
     });
 
   deleteVote = (id: string, token: string, name: string, voted: Date): Promise<void> =>
-    fetchResource<void>(Method.Delete, `/iapi/elections/${id}/votes?name=${name}&voted=${voted}`, token)
+    fetchResource<void>(Method.Delete, `/iapi/elections/${id}/votes?${new URLSearchParams({ name, voted: String(voted) })}`, token)
       .then((response) => {
         if (response.status !== 204) {
           throw toElectionError(response.status);

@@ -90,7 +90,7 @@ function ElectionTally(props: Readonly<ElectionTallyProps>) {
     <li key={tz}>
       <a
         className="dropdonw-item"
-        href={`/elections/${id}/tally?timeZone=${tz}#${props.token}`}
+        href={`/elections/${id}/tally?${new URLSearchParams({ timeZone: tz })}#${props.token}`}
       >
         {tz}
       </a>
