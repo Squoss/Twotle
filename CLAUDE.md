@@ -107,7 +107,7 @@ fegui/
 │   ├── components/, props/   # React GUI (driving adapters); most components double as route modules
 │   ├── routes/               # Thin route modules where routing needs glue (redirects, the election tabs and their clientAction)
 │   ├── FetchRepository.ts    # REST adapter for the Repository port (driven adapter)
-│   ├── fetchLookups.ts       # Localizations, time zones, validations (bypass the hexagon, like beapi's I18nController/ValidationsController)
+│   ├── fetchLookups.ts       # Localizations, time zones (cached), validations (bypass the hexagon, like beapi's I18nController/ValidationsController)
 │   └── fetchJson.ts          # Used by the two fetch adapters only
 ├── hexagon/                  # Domain core (npm workspace package @twotle/hexagon, no DOM lib)
 │   └── src/

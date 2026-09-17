@@ -42,8 +42,16 @@ const get = <T>(path: string): Promise<T> =>
 export const getLocalizations = (): Promise<Record<string, string>> =>
   get<Record<string, string>>("/iapi/l10nMessages");
 
-export const getTimeZones = (): Promise<Array<string>> =>
-  get<Array<string>>("/iapi/timeZones");
+// the time zones don't change while the app runs, so every revalidation of an election reuses the first request (unless that failed)
+let timeZones: Promise<Array<string>> | undefined;
+
+export const getTimeZones = (): Promise<Array<string>> => {
+  timeZones ??= get<Array<string>>("/iapi/timeZones").catch((error) => {
+    timeZones = undefined;
+    throw error;
+  });
+  return timeZones;
+};
 
 // URLSearchParams encodes e.g. "+", which would otherwise arrive as a space
 export const isValidCellPhoneNumber = (cellPhoneNumber: string): Promise<boolean> =>

@@ -1,6 +1,6 @@
 # fegui: frontend hexagon as a subproject + retrofit to React Router v8 framework mode
 
-> **Status (2026-09-17):** Stage 1 committed (`31e3c18`), except dependency-cruiser, which waits for TypeScript 7.1. Stage 2 committed (`0906bf5`). Stage 3a (`e98b5b5`) and 3b (`dc993d6`) committed; 3c done and staged (not yet committed), which completes Stage 3.
+> **Status (2026-09-17):** Stage 1 committed (`31e3c18`), except dependency-cruiser, which waits for TypeScript 7.1. Stage 2 committed (`0906bf5`). Stage 3 committed (3a `e98b5b5`, 3b `dc993d6`, 3c `bbcdb7c`). Follow-up done and staged (not yet committed): the time zones are cached.
 
 ## Context
 
@@ -204,7 +204,7 @@ Built on React Router **8.4.0**.
   - against Play's production build: `inspect.mjs`, `integration.mjs` 13/13, and the new `tokens.mjs` 5/5 (fragment-only switch to the voter token, to a bogus token and back, URL without fragment)
   - against the dev server: smoke 14/15 (the known flaw in the test), encoding 5/5, integration 13/13, tokens 5/5
 
-**3c (done 2026-09-17, staged):**
+**3c (done 2026-09-17, committed as `bbcdb7c`):**
 - **Mutations as `clientAction`s:** the six tab components submit typed intents via `useElectionSubmit()` (`useFetcher` + JSON). The intents live in `props/ElectionIntent.ts`, named after the entity or anti-factory method they call.
   - `routes/ElectionTab.tsx`'s `clientAction` takes the token from the URL fragment, recreates the election via the router context, calls the method (or `destroyElection`), and logs failures as the components did before.
   - React Router then revalidates the election loader.
@@ -213,7 +213,7 @@ Built on React Router **8.4.0**.
 - **`Legalese`** is just a `clientLoader` returning `redirect("/legalese/im")`.
 - **`root.tsx`:** `shouldRevalidate` skips re-fetching the localizations after actions. It uses `ShouldRevalidateFunctionArgs` from `react-router`, because the generated `Route` types lack it.
 - **Cost per save:** GET (recreate) + PUT/POST/PATCH/DELETE + GET election + GET time zones.
-  - **Possible follow-up:** stop re-fetching the static time zones on every revalidation.
+  - **Follow-up (2026-09-17, staged):** `fetchLookups.getTimeZones()` caches the first request, forgetting it after a failure, so a save now costs GET (recreate) + mutation + GET election. `actions.mjs` checks that no time-zone request follows a save; smoke, encoding and tokens pass as before.
 - **Verified:**
   - `npm run build` on Windows and the Docker `react` stage
   - against Play's production build: `inspect.mjs`, `integration.mjs` 13/13, `tokens.mjs` 5/5, and the new `actions.mjs` 3/3 (Abode's action and redirect; after saving texts only the election and time zones are re-fetched, not the localizations; subscriptions persist across a reload)
