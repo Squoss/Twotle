@@ -32,7 +32,6 @@ class DependencyRulesTestSuite extends AnyFunSuite {
   val API = "controllers.api.."
   // val DEFAULT = ""
   val DEV = "dev.."
-  val DOMAIN_ENTITYINTS = "domain.entity_interfaces.."
   val DOMAIN_SERVICEINTS = "domain.driving_ports.."
   val DOMAIN_PERSISTENCE = "domain.driven_ports.persistence.."
   val DOMAIN_VALUEOBJECTS = "domain.value_objects.."
@@ -84,7 +83,7 @@ class DependencyRulesTestSuite extends AnyFunSuite {
       .should()
       .dependOnClassesThat()
       .resideOutsideOfPackages(
-        (NOT_THE_APP :+ API :+ DOMAIN_SERVICEINTS :+ DOMAIN_ENTITYINTS :+ DOMAIN_VALUEOBJECTS)*
+        (NOT_THE_APP :+ API :+ DOMAIN_SERVICEINTS :+ DOMAIN_VALUEOBJECTS)*
       )
       .check(classes)
   }
@@ -149,7 +148,7 @@ class DependencyRulesTestSuite extends AnyFunSuite {
       .should()
       .dependOnClassesThat()
       .resideOutsideOfPackages(
-        (NOT_THE_APP ++ MONGODB_DRIVER :+ MONGODB_ADAPTER :+ DOMAIN_ENTITYINTS :+ DOMAIN_VALUEOBJECTS :+ DOMAIN_PERSISTENCE)*
+        (NOT_THE_APP ++ MONGODB_DRIVER :+ MONGODB_ADAPTER :+ DOMAIN_VALUEOBJECTS :+ DOMAIN_PERSISTENCE)*
       )
       .check(classes)
   }

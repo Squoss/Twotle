@@ -24,6 +24,7 @@ scalacOptions += "-no-indent" // https://docs.scala-lang.org/scala3/reference/ot
 libraryDependencies += guice
 libraryDependencies += ws
 libraryDependencies += "org.mongodb" % "mongodb-driver-reactivestreams" % "5.11.0"
+libraryDependencies += "commons-validator" % "commons-validator" % "1.11.0"
 
 libraryDependencies += "org.scalatestplus.play" %% "scalatestplus-play" % "7.0.2" % Test
 libraryDependencies += "com.tngtech.archunit" % "archunit" % "1.5.0" % Test

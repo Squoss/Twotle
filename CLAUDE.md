@@ -32,11 +32,11 @@ Twotle is a web application inspired by doodle.com and meant as a teaching aid f
 ### Backend (beapi/)
 ```bash
 cd beapi
-sbt                                                                         # Start sbt in interactive mode
-run -Dconfig.file=conf/insecureLocalhost.conf                               # Start Play dev server on port 9000 with mock implementations of database, e-mail, and SMS
-run -Dconfig.file=conf/insecureLocalhost.conf -Ddi.db=mongodb.MdbRepository # Start Play dev server on port 9000 with local MongoDB database (mongodb://localhost:27017/twotle) and mock implementations of e-mail and SMS
-test                                                                        # Run tests (includes ArchUnit dependency rules)
- ```
+sbt                                                                                             # Start sbt in interactive mode
+run -Dconfig.file=conf/insecureLocalhost.conf                                                   # Start Play dev server on port 9000 with mock implementations of database, e-mail, and SMS
+run -Dconfig.file=conf/insecureLocalhost.conf -Ddi.db=driven_adapters.persistence.MdbRepository # Start Play dev server on port 9000 with local MongoDB database (mongodb://localhost:27017/twotle) and mock implementations of e-mail and SMS
+test                                                                                            # Run tests (includes ArchUnit dependency rules)
+```
 
 ### Frontend (fegui/)
 ```bash
@@ -75,30 +75,49 @@ The backend follows strict hexagonal architecture with dependency rules enforced
 ```
 beapi/
 ├── app/
-│   ├── api/                  # REST controllers (driving adapters)
-│   ├── gui/                  # UI controllers (Twirl templates, React serving)
-│   ├── mongodb/              # Database adapter (driven adapter)
-│   ├── thirdparty_services/  # Email/SMS adapters (Mailjet, Threema)
-│   ├── dev/                  # Mock implementations for development
-│   ├── filters/              # HTTP filters
-│   └── Module.scala          # Guice dependency injection
-├── hexagon/                  # Domain core (independent subproject)
-│   └── src/main/scala/domain/
-│       ├── driving_ports/    # Input interfaces (Elections, Factory)
-│       ├── driven_ports/     # Output interfaces
-│       │   ├── persistence/  # Repository, Events
-│       │   └── notifications/# Email, Sms
-│       ├── entities/         # ElectionEntity
-│       ├── driving_adapters/ # ElectionsService
-│       └── value_objects/    # Id, AccessToken, EmailAddress, Vote, etc.
-└── conf/
-    ├── routes                # Play routing
-    └── application.conf      # Config with DI bindings
+│   ├── controllers/
+│   │   ├── api/                       # REST controllers (driving adapters); I18nController and ValidationsController bypass the hexagon
+│   │   └── gui/                       # ReactController (serves fegui's build)
+│   ├── driven_adapters/
+│   │   ├── persistence/               # MongoDB adapter (Mdb, MdbRepository)
+│   │   └── notifications/             # Email/SMS adapters (Mailjet, Threema)
+│   ├── filters/                       # HTTP filters
+│   └── Module.scala                   # Guice dependency injection
+├── hexagon/                           # Domain core (independent subproject)
+│   └── src/
+│       ├── main/scala/
+│       │   ├── domain/
+│       │   │   ├── driving_ports/     # Input interfaces (Elections, Factory)
+│       │   │   ├── driven_ports/      # Output interfaces
+│       │   │   │   ├── persistence/   # Repository, Events
+│       │   │   │   └── notifications/ # Email, Sms
+│       │   │   ├── entities/          # ElectionEntity
+│       │   │   ├── driving_adapters/  # ElectionsService
+│       │   │   └── value_objects/     # Id, AccessToken, EmailAddress, Vote, etc.
+│       │   └── dev/                   # Mock driven adapters (for insecureLocalhost.conf and ElectionsServiceTest)
+│       └── test/scala/                # ArchUnit rules (hexagon), ElectionsServiceTest
+├── conf/
+│   ├── routes                         # Play routing
+│   ├── application.conf               # Config with DI bindings
+│   └── insecureLocalhost.conf         # Local development config (mock database, e-mail, and SMS)
+├── public/build/                      # fegui's build (only a placeholder index.html is tracked)
+└── test/                              # ArchUnit rules (app)
 ```
 
 #### Dependency Rules
 
-The following rules are enforced by `sbt test`:
+The `hexagon` subproject lets the compiler enforce two things only: the hexagon can't see `app/`, and it can't see libraries missing from `hexagon/build.sbt` (e.g., Play, the MongoDB driver). So declare a library there only if the domain uses it. The rules *within* each project need ArchUnit; e.g., `app/` sees the whole hexagon, including `ElectionsService` and the `dev` mocks.
+
+`sbt test` runs both ArchUnit suites (the root project aggregates `hexagon`).
+
+`hexagon/src/test/scala/DependencyRulesTestSuite.scala` (checks the `domain` packages only):
+- The domain depends on nothing outside itself except the JDK, Scala, jakarta.inject, and libphonenumber
+- Value objects only depend on themselves
+- Only the services (driving adapters) and entities depend on the persistence port
+- Only the services depend on the driving ports and the notification port
+- Nothing depends on the services
+
+`test/DependencyRulesTestSuite.scala`:
 - API controllers only depend on driving ports and value objects
 - Nothing outside the router depends on API controllers
 - MongoDB adapter only depends on persistence interfaces
@@ -199,7 +218,8 @@ Required for full functionality:
 - `beapi/conf/application.conf` - Main config, DI bindings, security settings (incl. the CSP)
 - `beapi/app/Module.scala` - Guice module loading implementations from config
 - `beapi/app/controllers/gui/ReactController.scala` - Serves fegui's pre-rendered index.html (placeholders, CSP nonces) and assets
-- `beapi/test/DependencyRulesTestSuite.scala` - ArchUnit architecture tests
+- `beapi/test/DependencyRulesTestSuite.scala` - ArchUnit architecture tests (app)
+- `beapi/hexagon/src/test/scala/DependencyRulesTestSuite.scala` - ArchUnit architecture tests (hexagon)
 - `fegui/vite.config.ts` - Vite config (React Router plugin, /iapi proxy, /fegui/ base for builds, preview host for pre-rendering)
 - `fegui/react-router.config.ts` - React Router framework mode config (SPA)
 - `fegui/app/routes.ts` - Frontend route config
