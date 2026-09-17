@@ -1,28 +1,20 @@
+import { reactRouter } from '@react-router/dev/vite';
 import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
 
 // https://vite.dev/config/
-export default defineConfig(() => {
+export default defineConfig(({ command }) => {
   return {
+    // Play serves the built assets under /fegui/ (cf. beapi's conf/routes) and index.html for all other paths
+    base: command === 'build' ? '/fegui/' : '/',
     build: {
       assetsDir: 'vrassets',
-      // assetsInlineLimit: 0, <- had hoped to mimic INLINE_RUNTIME_CHUNK=false (https://create-react-app.dev/docs/advanced-configuration/)
-      outDir: 'build',
     },
-    plugins: [react()],
+    plugins: [reactRouter()],
     server: {
       proxy: {
         // string shorthand: http://localhost:5173/iapi -> http://localhost:9000/iapi
         '/iapi': 'http://localhost:9000',
       },
     },
-    experimental: {
-      // https://vitejs.dev/guide/build.html#advanced-base-options
-      renderBuiltUrl(filename: string, { hostId, hostType, type }: { hostId: string, hostType: 'js' | 'css' | 'html', type: 'public' | 'asset' }) {
-        if (type === 'asset' || type === 'public') {
-          return '/fegui/' + filename
-        }
-      }
-    }
   };
 });

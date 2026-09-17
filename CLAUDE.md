@@ -15,7 +15,7 @@ Twotle is a web application inspired by doodle.com and meant as a teaching aid f
 
 ## Work in Progress
 
-- Retrofitting fegui as a React Router v8 framework-mode SPA with its hexagon as an npm workspace package (`fegui/hexagon`). As of 2026-09-15, Stage 1 (the hexagon package) is done except for dependency-cruiser, which waits for TypeScript 7.1; Stage 2 is next. See [PLAN.md](PLAN.md) for the staged plan, decisions, risks, and verification steps.
+- Retrofitting fegui as a React Router v8 framework-mode SPA with its hexagon as an npm workspace package (`fegui/hexagon`). As of 2026-09-15, Stage 1 (the hexagon package) is done except for dependency-cruiser, which waits for TypeScript 7.1; Stage 2 (framework mode) is done; Stage 3 (idiomatic data APIs) is next. See [PLAN.md](PLAN.md) for the staged plan, decisions, risks, and verification steps.
 
 ## Conventions
 
@@ -35,7 +35,9 @@ test                                                                        # Ru
 ### Frontend (fegui/)
 ```bash
 cd fegui
-npm run start    # Start Vite dev server on port 5173 (proxies /iapi to localhost:9000)
+npm start           # Start the React Router (Vite) dev server on port 5173 (proxies /iapi to localhost:9000)
+npm run typecheck   # Generate route types (.react-router/) and type-check the app and the hexagon
+npm run build       # Pre-render the SPA into build/client (Play serves its index.html and, under /fegui/, its assets)
 ```
 
 ### Development Workflow
@@ -43,7 +45,7 @@ Run both servers simultaneously:
 1. Terminal 1: `cd beapi && sbt run`
 2. Terminal 2: `cd fegui && npm start`
 
-The Vite dev server proxies `/iapi/*` requests to the Play backend.
+The dev server proxies `/iapi/*` requests to the Play backend.
 
 ## Architecture
 
@@ -89,7 +91,7 @@ The following rules are enforced by `sbt test`:
 
 ### Frontend
 
-React SPA with React Router.
+React SPA built with React Router v8 in framework mode (`ssr: false`, cf. `react-router.config.ts`). `app/routes.ts` maps URLs to route modules (cf. beapi's `conf/routes`), and `app/root.tsx` renders the HTML document. The build pre-renders `build/client/index.html`, which Play serves for all non-API paths after replacing its `REPLACE_LANG` and `REPLACE_CSRF_TOKEN` placeholders and adding the request's CSP nonce to its inline scripts (cf. `ReactController` and `script-src` in `application.conf`); the assets are served under `/fegui/`.
 
 Internationalization/Localization (cf. `l10nContext.tsx`) is based on the backend (i.e., on Play's i18n/l10n support).
 
@@ -97,19 +99,24 @@ Organized along the lines of the Ports & Adapters pattern (Hexagonal architectur
 
 ```
 fegui/
-├── src/
-│   ├── components/, props/   # React GUI (driving adapters)
+├── app/
+│   ├── root.tsx              # HTML document (Layout) and composition root (wires FetchRepository into Factory/AntiFactory via React contexts)
+│   ├── routes.ts             # Route config (cf. beapi's conf/routes)
+│   ├── entry.client.tsx      # Browser entry; loads Bootstrap's JavaScript (route modules must not import it statically, as they're also evaluated in Node)
+│   ├── App.tsx               # App shell (navbar, footer, cookie consent) around the routes' <Outlet />
+│   ├── components/, props/   # React GUI (driving adapters); most components double as route modules
+│   ├── routes/               # Thin route modules where routing needs glue (redirects, election tabs)
 │   ├── FetchRepository.ts    # REST adapter for the Repository port (driven adapter)
 │   ├── fetchLookups.ts       # Localizations, time zones, validations (bypass the hexagon, like beapi's I18nController/ValidationsController)
-│   ├── fetchJson.ts          # Used by the two fetch adapters only
-│   └── index.tsx             # Composition root (wires FetchRepository into Factory/AntiFactory via React contexts)
-└── hexagon/                  # Domain core (npm workspace package @twotle/hexagon, no DOM lib)
-    └── src/
-        ├── driving_ports/    # ElectionFactory, ElectionAntiFactory
-        ├── driven_ports/     # Repository
-        ├── entities/         # ElectionEntity
-        ├── driving_adapters/ # Factory, AntiFactory
-        └── value_objects/    # Availability, ElectionError, Visibility, Vote, etc.
+│   └── fetchJson.ts          # Used by the two fetch adapters only
+├── hexagon/                  # Domain core (npm workspace package @twotle/hexagon, no DOM lib)
+│   └── src/
+│       ├── driving_ports/    # ElectionFactory, ElectionAntiFactory
+│       ├── driven_ports/     # Repository
+│       ├── entities/         # ElectionEntity
+│       ├── driving_adapters/ # Factory, AntiFactory
+│       └── value_objects/    # Availability, ElectionError, Visibility, Vote, etc.
+└── react-router.config.ts    # Framework mode config (SPA)
 ```
 
 Import the hexagon via `@twotle/hexagon` (the `hexagon/src/index.ts` barrel), never via relative paths. Nothing enforces the frontend dependency rules yet (dependency-cruiser waits for TypeScript 7.1); `npm run typecheck` only keeps DOM APIs out of the hexagon.
@@ -139,7 +146,9 @@ Required for full functionality:
 - `beapi/conf/application.conf` - Main config, DI bindings, security settings
 - `beapi/app/Module.scala` - Guice module loading implementations from config
 - `beapi/test/DependencyRulesTestSuite.scala` - ArchUnit architecture tests
-- `fegui/vite.config.ts` - Vite config with proxy setup
+- `fegui/vite.config.ts` - Vite config (React Router plugin, /iapi proxy, /fegui/ base for builds)
+- `fegui/react-router.config.ts` - React Router framework mode config (SPA)
+- `fegui/app/routes.ts` - Frontend route config
 
 ## Testing
 

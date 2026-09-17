@@ -22,9 +22,8 @@
  * THE SOFTWARE.
  */
 
-import { Modal } from "bootstrap";
 import React, { useContext } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { factoryContext } from "../factoryContext";
 import { l10nContext } from "../l10nContext";
 
@@ -38,7 +37,7 @@ function Abode(props: {}) {
 
   const handlePostElection = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    Modal.getInstance(document.getElementById("postElectionModal")!)!.hide();
+    import("bootstrap").then(({ Modal }) => Modal.getInstance(document.getElementById("postElectionModal")!)!.hide());
     factory
       .createElection()
       .then((response) => {

@@ -22,7 +22,6 @@
  * THE SOFTWARE.
  */
 
-import { Modal } from "bootstrap";
 import React, { useContext, useState } from "react";
 import { antiFactoryContext } from "../antiFactoryContext";
 import { Visibility } from "@twotle/hexagon";
@@ -87,7 +86,7 @@ function ElectionSettings(props: Readonly<ElectionSettingsProps>) {
 
   const handleDeleteElection = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    Modal.getInstance(document.getElementById("deleteElectionModal")!)!.hide();
+    import("bootstrap").then(({ Modal }) => Modal.getInstance(document.getElementById("deleteElectionModal")!)!.hide());
     antiFactory.destroyElection(String(props.election.id), props.election.organizerToken)
       .then(() => props.onElectionDeleted())
       .catch((error) => console.error(`failed to delete election: ${error}`));

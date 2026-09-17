@@ -14,14 +14,14 @@ COPY fegui/hexagon/package.json ./hexagon/
 # https://docs.npmjs.com/cli/v10/commands/npm-ci
 RUN npm ci
 
-COPY fegui/index.html ./
 COPY fegui/public ./public
-COPY fegui/src ./src
+COPY fegui/app ./app
 COPY fegui/hexagon/src ./hexagon/src
 COPY fegui/hexagon/tsconfig.json ./hexagon/
 COPY fegui/tsconfig.json ./
 COPY fegui/tsconfig.app.json ./
 COPY fegui/tsconfig.node.json ./
+COPY fegui/react-router.config.ts ./
 COPY fegui/vite.config.ts ./
 RUN npm run build
 
@@ -36,7 +36,7 @@ COPY beapi/project ./project
 COPY beapi/public ./public
 COPY beapi/hexagon ./hexagon
 COPY beapi/build.sbt ./
-COPY --from=react /squeng/twotle/build ./public/build
+COPY --from=react /squeng/twotle/build/client ./public/build
 RUN sbt stage
 
 

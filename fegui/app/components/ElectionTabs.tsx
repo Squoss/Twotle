@@ -23,7 +23,7 @@
  */
 
 import React, { useContext } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink } from "react-router";
 import ElectionCandidates from "./ElectionCandidates";
 import ElectionLinks from "./ElectionLinks";
 import ElectionSettings from "./ElectionSettings";

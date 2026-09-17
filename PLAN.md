@@ -1,13 +1,13 @@
 # fegui: frontend hexagon as a subproject + retrofit to React Router v8 framework mode
 
-> **Status (2026-09-15):** Stage 1 done and committed (`31e3c18`), except dependency-cruiser, which waits for TypeScript 7.1 (see Stage 1). Next step: Stage 2.
+> **Status (2026-09-15):** Stage 1 committed (`31e3c18`), except dependency-cruiser, which waits for TypeScript 7.1. Stage 2 done and staged (not yet committed). Next step: Stage 3.
 
 ## Context
 
 Paul asked two related questions about `fegui`:
 
 1. Can the frontend hexagon be a real subproject, like `beapi/hexagon` is an sbt subproject (`beapi/build.sbt:14-19`)?
-2. How much work would it be to move from the Create React App leftovers (Vite + `react-router-dom` v7 in library mode) to an elegant **React Router v8 framework-mode** project? v8.3.1 is current (released June 2026). v8 removes `react-router-dom` and makes middleware the default.
+2. How much work would it be to move from the Create React App leftovers (Vite + `react-router-dom` v7 in library mode) to an elegant **React Router v8 framework-mode** project? v8.3.1 was current when planned (released June 2026); Stage 2 used 8.4.0. v8 removes `react-router-dom` and makes middleware the default.
 
 The two are related. Framework mode's `app/` directory next to a `hexagon/` workspace package would match `beapi/app` + `beapi/hexagon` one to one. That is a nice parallel for the textbook.
 
@@ -71,11 +71,11 @@ Stage 2 alone already removes the patchwork. Stage 3 is what makes it "elegant".
    - **`HttpError` is gone.** `hexagon/src/value_objects/ElectionError.ts` has an `ElectionErrorReason` that mirrors `beapi`'s `Error` enum, plus `UNEXPECTED`. `FetchRepository.toElectionError` is the inverse of `ElectionsController.toErrorResponse`.
 3. **Rewrote imports** in `src/components/*`, `src/props/*`, the contexts and `src/index.tsx` to `@twotle/hexagon`.
 4. **Enforcement: deferred until TypeScript 7.1** (Paul's decision).
-   - **Why:** TS 7.0's npm package has no compiler JS API, which dependency-cruiser needs to parse TypeScript. Its `swc` fallback is deprecated and aborts on the first `.tsx` file containing JSX. `typescript@7.1` is expected to bring the API back.
+   - **Why:** TS 7.0's npm package has no compiler JS API, which dependency-cruiser needs to parse TypeScript. Its `swc` fallback is deprecated and aborts on the first `.tsx` file containing JSX. `typescript@7.1` is expected to bring the API back (still only a `next` dev build as of 2026-09-15).
    - **Until then only the hexagon's tsconfig guards it.** A probe using `document` failed to compile, but `import React from "react"` compiled.
    - **When TS 7.1 lands**, add:
      - the `dependency-cruiser` dev dependency
-     - `.dependency-cruiser.cjs`, with rules mirroring both `DependencyRulesTestSuite.scala` files. For example: the hexagon depends on nothing outside itself; only `FetchRepository`/`fetchLookups` use `fetchJson`; only `src/index.tsx` depends on `FetchRepository`.
+     - `.dependency-cruiser.cjs`, with rules mirroring both `DependencyRulesTestSuite.scala` files. For example: the hexagon depends on nothing outside itself; only `FetchRepository`/`fetchLookups` use `fetchJson`; only `app/root.tsx` depends on `FetchRepository`.
      - an `npm run lint:arch` script and a matching step in `.github/workflows/test.yml`
 5. **Updated build files:**
    - The `Dockerfile` react stage copies `hexagon/package.json` before `npm ci`, and `hexagon/src` + `hexagon/tsconfig.json` before the build.
@@ -85,83 +85,115 @@ Stage 2 alone already removes the patchwork. Stage 3 is what makes it "elegant".
 - Election errors other than 403/404/410 now show the reason name instead of the status code, e.g. `ProtectedAccess` instead of `409`, `Unexpected` instead of `500`.
 - Reminders use the entity's `organizerToken` instead of the URL token. These are identical for organizers, and the Links tab is organizer-only.
 
-**Verified:**
-- `npm run typecheck`
-- `vite build`
-- the hexagon boundary probe
-- no leftover imports of the old paths, and `fetchJson` used only by the two fetch adapters
+**Follow-up (`6e3c6d8`):** all query strings in fegui are built with `URLSearchParams`, so a `+` no longer arrives at Play as a space.
 
-**Not verified yet:**
-- the Docker build (no Docker daemon was running)
-- the browser smoke test (see Verification)
+**Verified:** `npm run typecheck`, `vite build`, the hexagon boundary probe, and a browser smoke test against the dev servers.
 
-### Stage 2: React Router v8 framework mode, SPA (`ssr: false`), same behaviour
+### Stage 2: React Router v8 framework mode, SPA (`ssr: false`), same behaviour (done 2026-09-15)
+
+Built on React Router **8.4.0**.
 
 1. **Dependencies:**
-   - Remove `react-router-dom` and `@vitejs/plugin-react`.
-   - Add `react-router@^8`, plus `@react-router/dev@^8` as a dev dependency.
+   - `react-router-dom` and `@vitejs/plugin-react` are gone. `react-router@^8.4.0` and `@react-router/dev@^8.4.0` are in; the latter brings `@react-router/node` and React Refresh.
+   - `isbot@^5` is in as well. React Router's default server entry, which the build-time pre-render uses, needs it; `react-router typegen` added it on its own.
+   - `package.json` has `"type": "module"`, and the unused CRA leftovers `eslintConfig` and `browserslist` are gone.
+   - The lockfile changed only by the router swap, the dev tooling, and `isbot`.
 2. **`vite.config.ts`:**
    - `plugins: [reactRouter()]`
-   - Keep the `/iapi` proxy.
-   - Replace `experimental.renderBuiltUrl` with `base: "/fegui/"`.
-   - Keep `assetsDir: "vrassets"` if still wanted.
-3. **New `react-router.config.ts`:** `{ ssr: false }` (builds to `build/client/index.html`).
-4. **Rename `src/` → `app/`** (framework convention, and matches `beapi/app`).
-5. **New `app/root.tsx`**, built from `index.html` + `index.tsx` + `App.tsx`:
-   - `Layout` carries the `<html lang="REPLACE_LANG" data-bs-theme>`, the csrf `<meta>`, the rybbit script and the favicons, with `<Meta/><Links/><Scripts/><ScrollRestoration/>`.
-   - Put `suppressHydrationWarning` on `<html>` and the csrf `<meta>`, because Play rewrites those placeholders after the build-time prerender.
-   - Global CSS imports.
-   - The default export is the current `App` shell (navbar/footer/cookie modal + `<Outlet/>`).
-   - `HydrateFallback` shows a spinner.
-   - `ErrorBoundary` replaces the ad-hoc not-found handling.
-   - Delete `index.html`, `index.tsx`, `App.tsx`, and `react-app-env.d.ts` (replaced by the `+types` typegen).
-6. **New `app/routes.ts`**, config-based rather than file-based. It deliberately reads like Play's `conf/routes`:
-   - `layout("root")`
-   - `index("routes/abode.tsx")`
-   - `route("elections/:election", "routes/election.tsx", [index(...), route("texts", ...), route("dats", ...), route("links", ...), route("tally", ...), route("settings", ...)])`
-   - `legalese/*`, `prices`, `*`
-   - This collapses the 5 duplicated `<Route>`s in `Election.tsx` into one layout route whose children render `ElectionTabs` with the active tab derived from the route.
-7. **Imports:** `react-router-dom` → `react-router` everywhere (`App`, `Abode`, `Election`, `ElectionTabs`, `ElectionLinks`, `NotFound`).
-8. **Scripts:**
-   - `start: react-router dev`
-   - `build: react-router build`
-   - `typecheck: react-router typegen && tsc -b`
-   - Add `.react-router/` to `tsconfig.app.json` `include`/`rootDirs` and to `.gitignore`.
-9. **Backend/deploy:**
-   - `ReactController.scala:47` → `public/build/client/index.html`, or keep `public/build` and change `Dockerfile:36` to `COPY --from=react /squeng/twotle/build/client ./public/build` (preferred: no Scala change).
-   - `robots.txt`/`browserconfig.xml` routes stay valid.
-   - Update the `CLAUDE.md` dev commands.
+   - `base: "/fegui/"` for `build` only; the dev server stays at `/`, and the router's `basename` stays `/`.
+   - `assetsDir: "vrassets"` kept, `/iapi` proxy kept, `experimental.renderBuiltUrl` removed.
+3. **New `react-router.config.ts`:** `{ ssr: false }`. The build writes `build/client/index.html` in SPA mode, with route discovery `initial`, so no `/__manifest` requests hit Play.
+4. **Renamed `src/` → `app/`** with `git mv`.
+5. **New `app/root.tsx`**, built from `index.html` and `index.tsx`:
+   - `Layout` carries `<html lang="REPLACE_LANG" data-bs-theme id="rootElement">`, the csrf `<meta>`, the favicons and `<Meta/><Links/><Scripts/><ScrollRestoration/>`.
+     - `suppressHydrationWarning` sits on `<html>` and the csrf `<meta>`, because Play rewrites those placeholders.
+     - The Rybbit script is now `async` rather than `defer`, so that React 19 treats it as a resource instead of warning about a script tag.
+   - The default export is the composition root: the two contexts and `I18nApp` around the existing `App.tsx` shell. **Deviation:** `App.tsx` stays a separate file instead of merging into `root.tsx`.
+   - `HydrateFallback` is a spinner, pre-rendered into `index.html`; `ErrorBoundary` is a minimal alert.
+   - Deleted: `index.html`, `src/index.tsx`, `src/react-app-env.d.ts`.
+6. **New `app/entry.client.tsx`:** `hydrateRoot` + `<HydratedRouter/>`, plus `import "bootstrap"`.
+   - **Why:** Bootstrap's JavaScript touches `document` as soon as it's loaded, and route modules are also evaluated in Node for the pre-render.
+   - `App`, `Abode` and `ElectionSettings` therefore get `Modal` via `import("bootstrap")` in effects and handlers.
+7. **New `app/routes.ts`**, config-based (cf. Play's `conf/routes`):
+   - **Self-contained components are route modules directly:** `Abode`, `Election`, `Masthead`, `PrivacyPolicy`, `ToDo`, `Prices`, `NotFound` (the latter twice, once with the id `election-not-found`).
+   - **Thin route modules in `app/routes/`** where routing needs glue:
+     - `ElectionIndex` (the brand-new/tally redirect) and `Legalese` (the redirect to `/legalese/im`).
+     - `ElectionTab`: one module reused by the five tab routes via the ids `election-texts` … `election-settings`, which it maps to `ACTIVE_TAB`.
+   - `Election` renders `<Outlet context>` instead of nested `<Routes>`. Its type is `ElectionOutletContext = Omit<ElectionTabsProps, "activeTab">`.
+8. **Imports:** `react-router-dom` → `react-router` everywhere.
+9. **Scripts and TypeScript:**
+   - `start: react-router dev`, `build: react-router typegen && tsc -b && react-router build`, `typecheck: react-router typegen && tsc -b`
+   - `tsconfig.app.json` includes `app` + `.react-router/types/**/*`, with `rootDirs` and `types: ["vite/client"]`. v8 has no `@react-router/dev/types`. `root.tsx` uses the generated `./+types/root`.
+   - `tsconfig.node.json` includes `react-router.config.ts`; `.gitignore` and `.dockerignore` ignore `.react-router`.
+10. **Backend/deploy:**
+    - The `Dockerfile` copies `app/` and `react-router.config.ts` (no `index.html`) and `build/client` into `public/build`.
+    - The Sonar `sources` point at `fegui/app/`.
+    - **CSP nonces (Paul's decision):**
+      - **The problem:** Play's CSP (`script-src 'self' https://app.rybbit.io/`) blocked the four inline scripts in React Router's pre-rendered `index.html`: the router context, the module script importing the manifest and `entry.client`, and two stream scripts. So the Play-served app never started.
+      - **Why only the production-like check caught it:** the dev server doesn't send Play's CSP.
+      - **The fix:** `application.conf` adds `${play.filters.csp.nonce.pattern}` to `script-src` (Play 3.0.11 generates nonces by default), and `ReactController.guiRoute` adds the request's `CSPNonce` to every `<script` in `index.html`.
+      - **Rejected alternatives:** script hashes change with every build; `'unsafe-inline'` weakens the CSP; moving the inline scripts into files at build time would depend on React Router's output format.
+
+**Fixes found along the way:**
+- **`I18nApp` crashed on every page:** it logs `JSON.stringify(props)`, and its `children` is now created inside `Root`'s render, which React 19's dev build makes circular. It now leaves `children` out.
+- **Encoding slip-through:** `App.tsx`'s language links re-inserted decoded query values unencoded, which `6e3c6d8` had missed.
+- **Duplicate csrf-token `<meta>` under Play:**
+  - **The problem:** React 19 doesn't patch a `<meta>` whose `content` differs from the server HTML. It added a second one with the placeholder; the real one only happened to come first.
+  - **The fix:** `Layout` now renders the values Play filled in, read from `document` in the browser and left as placeholders during the pre-render. `suppressHydrationWarning` is gone as well.
+
+**Gotchas:**
+- **Install order:** `npm install` with the new `package.json` and the old lock fails with ERESOLVE; `npm uninstall react-router-dom @vitejs/plugin-react` first, then install.
+- **No concurrent dev server:** don't run a dev server while `react-router typegen`/`npm install` might install something; Windows file locks gutted `node_modules` once.
+
+**Verified:**
+- **`npm run typecheck` and `npm run build`:**
+  - `index.html` keeps both placeholders and the pre-rendered spinner.
+  - All assets are under `/fegui/vrassets/`, with `basename` `/` and route discovery `initial`.
+- **Dev server** (`react-router dev` + Play with mocks):
+  - The browser smoke test passes 14 of 15; the one failure is a flaw in the test itself.
+  - The encoding check passes 5 of 5.
+  - The integration check passes 13 of 13: cookie modal and language dropdown, POST/PUT with the CSRF header, client-side navigation across all five tabs, a deep-link reload, the legalese redirect, and no hydration warnings. It passed 13 of 13 again after the csrf-token fix.
+- **Play-served production build** (copied into `beapi/public/build` before starting Play, restored afterwards):
+  - **CSP:** the CSP header's nonce matches the nonce on all five `<script>` tags, with no CSP violations.
+  - **CSRF:** after hydration there is exactly one csrf-token `<meta>` and a real `lang`, and the real token is sent with POST.
+  - **Integration check:** 13 of 13.
+- **Backend:** `sbt test` passes (27 + 9 tests).
+- **`npm run serve` (`vite preview`): removed.** It answered every path, assets under `/fegui/vrassets/` included, with `index.html`. Only Play splits assets (under `/fegui/`) from app routes, so a production-like check needs Play (see Verification 4).
+
+**Not verified:** the Docker build (no Docker daemon).
+
+**Known backend issue (pre-existing):** `ReactController` reads `index.html` via `getResourceAsStream` without closing the stream. On Windows that keeps `target/web/.../build/index.html` locked, so Play dev reloads fail with `AccessDeniedException` once `public/build` changes. For a production-like local test, copy the build into `beapi/public/build` *before* starting Play.
 
 ### Stage 3: Idiomatic data layer (the "elegant" part)
 
-1. **Composition root (the `Module.scala` analogue):** a new `app/entry.client.tsx` builds `FetchRepository`/`Factory`/`AntiFactory` once. It seeds them with `getContext()` → `RouterContextProvider` + `createContext<ElectionFactory>()` etc. This replaces `factoryContext.ts` and `antiFactoryContext.ts`.
+1. **Composition root (the `Module.scala` analogue):** `app/entry.client.tsx` (which already exists for Bootstrap) builds `FetchRepository`/`Factory`/`AntiFactory` once. It seeds them with `getContext()` → `RouterContextProvider` + `createContext<ElectionFactory>()` etc. This replaces `factoryContext.ts`, `antiFactoryContext.ts` and the providers in `root.tsx`.
 2. **Localizations:** a root `clientLoader` fetches them via `fetchLookups.getLocalizations`. `useRouteLoaderData("root")` or a small `useL10n()` hook replaces `I18nApp.tsx` and `l10nContext`.
 3. **Election loading:**
-   - `routes/election.tsx` gets a `clientLoader` that calls `context.get(factory).recreateElection(...)` and throws `data(null, { status })` on `ElectionError`s.
+   - `components/Election.tsx` (or a new `routes/Election.tsx`) gets a `clientLoader` that calls `context.get(factory).recreateElection(...)` and throws `data(null, { status })` on `ElectionError`s.
    - A route `ErrorBoundary` renders Forbidden/Not Found/Gone.
-   - Child tabs read the election via `useRouteLoaderData`.
+   - Child tabs read the election via `useRouteLoaderData` instead of `useOutletContext`.
    - Entity mutations (`updateElectionText`, `castVote`, …) run as `clientAction`s or imperatively followed by `useRevalidator()`. This removes the `onElectionChanged` prop drilling and much of `props/*`.
-4. **Other routes:** `Abode` creates the election via a `clientAction` + `redirect(...)`. `legalese` → `redirect("/legalese/im")` in a `clientLoader`.
+4. **Other routes:** `Abode` creates the election via a `clientAction` + `redirect(...)`. `Legalese` → `redirect("/legalese/im")` in a `clientLoader`.
 
 ## Risks / things to check during implementation
 
 - **Capability token lives in the URL fragment** (`#token`). A `clientLoader`'s `request.url` likely excludes the fragment. Read `window.location.hash` inside the loader instead, and check that hash-only navigations between organizer/voter links revalidate (add `shouldRevalidate` if not).
-- **Build-time prerender imports route modules in Node.** `import { Modal } from "bootstrap"` in `root`/`Abode` may touch `window`/`document`. If so, switch to a dynamic `import("bootstrap")` inside effects/handlers.
-- **`base: "/fegui/"` vs. router `basename: "/"`:** confirm that asset URLs in the prerendered `index.html` resolve under `/fegui/` and that the Play `/*reactRoute` fallback still wins for app URLs.
+- **Route modules that are plain components** (e.g. `Abode`, `Election`) receive React Router's route props (`params`, `loaderData`, `matches`, …). Their `console.log(JSON.stringify(props))` now logs those; watch for circular values once loaders return entities.
 - **Workspace hoisting:** until dependency-cruiser runs, nothing stops the hexagon from importing React.
+- *Resolved in Stage 2:* the Node pre-render and Bootstrap (see `entry.client.tsx`), and `base: "/fegui/"` vs. `basename: "/"` (build-only `base`).
 
 ## Critical files
 
 - **fegui:**
-  - `package.json`, `vite.config.ts`, `tsconfig*.json`
-  - `index.html`, `src/index.tsx`, `src/App.tsx`, `src/I18nApp.tsx`
-  - `src/components/Election.tsx`, `src/components/ElectionTabs.tsx`, `src/components/Abode.tsx`
-  - `src/FetchRepository.ts`, `src/fetchLookups.ts`, `src/useInputValidation.tsx`
+  - `package.json`, `vite.config.ts`, `react-router.config.ts`, `tsconfig*.json`
+  - `app/root.tsx`, `app/routes.ts`, `app/entry.client.tsx`, `app/App.tsx`, `app/I18nApp.tsx`
+  - `app/components/Election.tsx`, `app/components/ElectionTabs.tsx`, `app/components/Abode.tsx`, `app/routes/*`
+  - `app/FetchRepository.ts`, `app/fetchLookups.ts`, `app/useInputValidation.tsx`
   - `hexagon/src/**`
-- **New fegui files:** `app/root.tsx`, `app/routes.ts`, `app/entry.client.tsx`, `react-router.config.ts`, `.dependency-cruiser.cjs` (once TS 7.1 is out)
+- **New fegui files (Stage 3 and later):** `.dependency-cruiser.cjs` (once TS 7.1 is out)
 - **Elsewhere:**
   - `Dockerfile`, `.github/workflows/test.yml`, `.github/workflows/scan.yml`
-  - `beapi/app/controllers/gui/ReactController.scala` (only if the build path isn't remapped in the Dockerfile)
+  - `beapi/app/controllers/gui/ReactController.scala` (see the known issue above)
   - `CLAUDE.md`
 
 ## Verification (per stage)
@@ -172,8 +204,8 @@ Stage 2 alone already removes the patchwork. Stage 3 is what makes it "elegant".
    - `build/client/index.html` still contains `REPLACE_CSRF_TOKEN` and `REPLACE_LANG`.
    - Asset URLs start with `/fegui/`.
 3. **Dev loop:**
-   - `cd beapi && sbt "run -Dconfig.file=conf/insecureLocalhost.conf"` plus `cd fegui && npm start`.
-   - Smoke test in the browser (via the `run` skill / Chrome):
+   - `cd beapi && sbt "run -Dconfig.file=conf/insecureLocalhost.conf"` plus `cd fegui && npm start`. Don't install packages while the dev server runs.
+   - Smoke test in the browser (headless Edge via Playwright, since the Chrome extension isn't installed):
      - create an election
      - land on `texts?brandNew=true#token`
      - switch all 5 tabs
@@ -184,6 +216,6 @@ Stage 2 alone already removes the patchwork. Stage 3 is what makes it "elegant".
      - switch the locale de/en and toggle dark mode
      - reload deep links
      - check `/legalese` redirect, `/prices`, and an unknown path
-4. **Production-like:** `docker build .` and run it. Hit a deep link such as `/elections/<id>/tally#<token>` directly so the Play-served `index.html` and `/fegui/` assets are exercised with a real CSRF token (POST/PUT succeed).
+4. **Production-like:** `docker build .` and run it, or locally copy `fegui/build/client` into `beapi/public/build` before starting Play (restore the tracked placeholder `index.html` afterwards). Hit a deep link such as `/elections/<id>/tally#<token>` directly so the Play-served `index.html` and `/fegui/` assets are exercised with a real CSRF token (POST/PUT succeed).
 5. **Backend:** `cd beapi && sbt test` (ArchUnit) if `ReactController` changed.
 6. **Git:** stage after each stage and stop before committing, so Paul can review.

@@ -33,9 +33,9 @@ jobs:
           args: >
             -Dsonar.organization=squoss
             -Dsonar.projectKey=Squoss_Twotle
-            -Dsonar.sources=beapi/app/,beapi/hexagon/src/main/scala/,fegui/src/,fegui/hexagon/src/
+            -Dsonar.sources=beapi/app/,beapi/hexagon/src/main/scala/,fegui/app/,fegui/hexagon/src/
             -Dsonar.tests=beapi/test/,beapi/hexagon/src/test/scala/
-#            -Dsonar.exclusions=fegui/src/__tests__/**/*
+#            -Dsonar.exclusions=fegui/app/__tests__/**/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_CLOUD_TOKEN }}

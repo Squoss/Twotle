@@ -33,6 +33,7 @@ import play.api.mvc.BaseController
 import play.api.mvc.ControllerComponents
 import play.api.mvc.Request
 import play.filters.csrf.CSRF
+import views.html.helper.CSPNonce
 
 import scala.io.Codec
 import scala.io.Source
@@ -61,10 +62,13 @@ class ReactController @Inject() (
   def guiRoute(reactRoute: String) = Action { implicit request: Request[AnyContent] =>
     val token =
       CSRF.getToken // // https://www.playframework.com/documentation/latest/ScalaCsrf#Getting-the-current-token
+    val nonce =
+      CSPNonce() // https://www.playframework.com/documentation/latest/CspFilter (React Router's pre-rendered index.html contains inline scripts)
     Ok(
       indexHtml
         .replace("REPLACE_CSRF_TOKEN", token.get.value)
         .replace("REPLACE_LANG", messagesApi("locale")(using request.lang))
+        .replace("<script", s"""<script nonce="$nonce"""")
     )
       .as("text/html")
   }

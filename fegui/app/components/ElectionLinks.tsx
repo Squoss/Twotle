@@ -23,7 +23,7 @@
  */
 
 import React, { useContext } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink } from "react-router";
 import Clipboard from "./Clipboard";
 import { l10nContext } from "../l10nContext";
 import { ElectionLinksProps } from "../props/ElectionLinksProps";

@@ -23,13 +23,11 @@
  */
 
 import React, { useCallback, useContext, useEffect, useState } from "react";
-import { Navigate, Outlet, Route, Routes, useLocation, useParams, useSearchParams } from "react-router-dom";
+import { Outlet, useLocation, useParams, useSearchParams } from "react-router";
 import { ElectionEntity, ElectionError, ElectionErrorReason } from "@twotle/hexagon";
-import ElectionTabs from "./ElectionTabs";
-import { ACTIVE_TAB } from "../props/ElectionTabsProps";
 import { getTimeZones } from "../fetchLookups";
-import NotFound from "./NotFound";
 import { factoryContext } from "../factoryContext";
+import { ElectionOutletContext } from "../props/ElectionOutletContext";
 
 function Election(props: {}) {
   console.log("Election props: " + JSON.stringify(props));
@@ -107,104 +105,22 @@ function Election(props: {}) {
         return <p>{electionErrorReason}</p>;
     }
   } else if (election) {
+    // the child routes (cf. routes.ts) render the tabs
+    const context: ElectionOutletContext = {
+      election,
+      token: token.substring(1),
+      onElectionChanged: setElection,
+      sendLinksReminder,
+      timeZones,
+      onElectionDeleted,
+      isOrganizer: token.substring(1) === election.organizerToken,
+      isBrandNew: brandNew,
+    };
+
     return (
       <React.Fragment>
         <title>{election.name}</title>
-        <Routes>
-          <Route path="/" element={<Outlet />}>
-            <Route
-              index
-              element={
-                token.substring(1) === election.organizerToken && brandNew ? (
-                  <Navigate to={`/elections/${id}/texts?brandNew=true${token}`} />
-                ) : (
-                  <Navigate to={`/elections/${id}/tally${token}`} />
-                )
-              }
-            />
-            <Route
-              path="texts"
-              element={
-                <ElectionTabs
-                  activeTab={ACTIVE_TAB.TEXTS}
-                  election={election}
-                  token={token.substring(1)}
-                  onElectionChanged={setElection}
-                  sendLinksReminder={sendLinksReminder}
-                  timeZones={timeZones}
-                  onElectionDeleted={onElectionDeleted}
-                  isOrganizer={token.substring(1) === election.organizerToken}
-                  isBrandNew={brandNew}
-                />
-              }
-            />
-            <Route
-              path="dats"
-              element={
-                <ElectionTabs
-                  activeTab={ACTIVE_TAB.CANDIDATES}
-                  election={election}
-                  token={token.substring(1)}
-                  onElectionChanged={setElection}
-                  sendLinksReminder={sendLinksReminder}
-                  timeZones={timeZones}
-                  onElectionDeleted={onElectionDeleted}
-                  isOrganizer={token.substring(1) === election.organizerToken}
-                  isBrandNew={brandNew}
-                />
-              }
-            />
-            <Route
-              path="links"
-              element={
-                <ElectionTabs
-                  activeTab={ACTIVE_TAB.LINKS}
-                  election={election}
-                  token={token.substring(1)}
-                  onElectionChanged={setElection}
-                  sendLinksReminder={sendLinksReminder}
-                  timeZones={timeZones}
-                  onElectionDeleted={onElectionDeleted}
-                  isOrganizer={token.substring(1) === election.organizerToken}
-                  isBrandNew={brandNew}
-                />
-              }
-            />
-            <Route
-              path="tally"
-              element={
-                <ElectionTabs
-                  activeTab={ACTIVE_TAB.VOTES}
-                  election={election}
-                  token={token.substring(1)}
-                  onElectionChanged={setElection}
-                  sendLinksReminder={sendLinksReminder}
-                  timeZones={timeZones}
-                  onElectionDeleted={onElectionDeleted}
-                  isOrganizer={token.substring(1) === election.organizerToken}
-                  isBrandNew={brandNew}
-                />
-              }
-            />
-            <Route
-              path="settings"
-              element={
-                <ElectionTabs
-                  activeTab={ACTIVE_TAB.SETTINGS}
-                  election={election}
-                  token={token.substring(1)}
-                  onElectionChanged={setElection}
-                  sendLinksReminder={sendLinksReminder}
-                  timeZones={timeZones}
-                  onElectionDeleted={onElectionDeleted}
-                  isOrganizer={token.substring(1) === election.organizerToken}
-                  isBrandNew={brandNew}
-                />
-              }
-            />
-            <Route path="*" element={<NotFound />} />
-          </Route>
-        </Routes>
+        <Outlet context={context} />
       </React.Fragment>
     );
   } else {

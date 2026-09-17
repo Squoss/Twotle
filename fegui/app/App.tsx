@@ -22,9 +22,8 @@
  * THE SOFTWARE.
  */
 
-import { Modal } from "bootstrap";
 import React, { useContext, useEffect, useState } from "react";
-import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
+import { Link, NavLink, Outlet, useLocation } from "react-router";
 import { l10nContext } from "./l10nContext";
 
 function App(props: {}) {
@@ -35,7 +34,7 @@ function App(props: {}) {
   const location = useLocation();
   let locationString = location.pathname;
   locationString += "?";
-  new URLSearchParams(location.search).forEach((v, k) => (locationString += k === "locale" ? "" : `${k}=${v}&`));
+  new URLSearchParams(location.search).forEach((v, k) => (locationString += k === "locale" ? "" : `${new URLSearchParams({ [k]: v })}&`));
   locationString += "locale=NEWLOCALE";
   locationString += location.hash;
 
@@ -47,8 +46,11 @@ function App(props: {}) {
   useEffect(() => {
     const cookieConsentFlag = globalThis.sessionStorage.getItem("cookieConsent");
     if (cookieConsentFlag === null) {
-      const modal = new Modal(document.getElementById("cookieConsentModal")!);
-      modal.show();
+      // Bootstrap's JavaScript needs the DOM, so it must not be imported statically (cf. entry.client.tsx)
+      import("bootstrap").then(({ Modal }) => {
+        const modal = new Modal(document.getElementById("cookieConsentModal")!);
+        modal.show();
+      });
       globalThis.sessionStorage.setItem("cookieConsent", "shown");
     }
   }, []);

@@ -31,7 +31,8 @@ interface I18nAppProperties {
 }
 
 function I18nApp(props: Readonly<I18nAppProperties>) {
-  console.log("I18nApp props: " + JSON.stringify(props));
+  // children is a React element created in root.tsx's render, whose owner makes it circular
+  console.log("I18nApp props: " + JSON.stringify({ ...props, children: undefined }));
 
   const [localizations, setLocalizations] = useState<Localizations>({});
 
