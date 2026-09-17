@@ -22,116 +22,97 @@
  * THE SOFTWARE.
  */
 
-import React, { useCallback, useContext, useEffect, useState } from "react";
-import { Outlet, useLocation, useParams, useSearchParams } from "react-router";
-import { ElectionEntity, ElectionError, ElectionErrorReason } from "@twotle/hexagon";
+import React, { useEffect } from "react";
+import { Outlet, useLocation, useRevalidator } from "react-router";
+import { ElectionError, ElectionErrorReason } from "@twotle/hexagon";
+import type { Route } from "./+types/Election";
+import { factoryContext } from "../context";
 import { getTimeZones } from "../fetchLookups";
-import { factoryContext } from "../factoryContext";
-import { ElectionOutletContext } from "../props/ElectionOutletContext";
 
-function Election(props: {}) {
+// an ElectionError that remembers the capability token it occurred with (cf. useTokenRevalidation)
+class ElectionLoaderError extends ElectionError {
+  constructor(reason: ElectionErrorReason, public readonly token: string) {
+    super(reason);
+  }
+}
+
+// The capability token is the URL's fragment, which React Router strips from the request's URL.
+// So the loader reads it from window.location, which during client-side navigations may still be the previous URL (cf. useTokenRevalidation).
+export async function clientLoader({ params, request, context }: Route.ClientLoaderArgs) {
+  const token = window.location.hash.substring(1);
+  if (token === "") {
+    return null;
+  }
+
+  const timeZone = new URL(request.url).searchParams.get("timeZone") ?? Intl.DateTimeFormat().resolvedOptions().timeZone;
+  try {
+    const [election, timeZones] = await Promise.all([
+      context.get(factoryContext).recreateElection(params.election, token, timeZone),
+      getTimeZones().catch((error) => {
+        console.error(`failed to get time zones: ${error}`);
+        return new Array<string>();
+      }),
+    ]);
+    return { election, timeZones, token };
+  } catch (error) {
+    throw error instanceof ElectionError ? new ElectionLoaderError(error.reason, token) : error;
+  }
+}
+
+// Revalidates when the location's capability token differs from the one the loader used: the loader may have seen the previous URL,
+// and React Router doesn't revalidate when only the URL's fragment changes (e.g., from the organizer's to the voters' link).
+function useTokenRevalidation(loadedToken: string | undefined) {
+  const token = useLocation().hash.substring(1);
+  const revalidator = useRevalidator();
+
+  useEffect(() => {
+    if (loadedToken !== undefined && token !== loadedToken) {
+      revalidator.revalidate();
+    }
+  }, [token, loadedToken]);
+
+  return token;
+}
+
+function Election(props: Route.ComponentProps) {
   console.log("Election props: " + JSON.stringify(props));
 
-  const factory = useContext(factoryContext)!;
-  const id = useParams().election;
-  const location = useLocation();
-  const token = location.hash;
-  const [searchParams] = useSearchParams();
-  const brandNew = searchParams.has("brandNew");
-  const tz = searchParams.get("timeZone");
-
-  const [election, setElection] = useState<ElectionEntity | undefined>(undefined);
-  const [electionErrorReason, setElectionErrorReason] = useState<ElectionErrorReason | undefined>(undefined);
-  const [timeZones, setTimeZones] = useState<Array<string>>([]);
-
-  const getElection = useCallback(() => {
-    if (token === "" || !id) {
-      return;
-    }
-
-    factory
-      .recreateElection(id, token.substring(1), tz ?? Intl.DateTimeFormat().resolvedOptions().timeZone)
-      .then((election) => {
-        setElectionErrorReason(undefined);
-        setElection(election);
-      })
-      .catch((error) => {
-        if (error instanceof ElectionError) {
-          setElectionErrorReason(error.reason);
-        }
-        console.error(`failed to get election: ${error}`);
-      });
-  }, [id, token, tz]);
-
-  useEffect(() => {
-    getElection();
-  }, [getElection]);
-
-  useEffect(() => {
-    getTimeZones()
-      .then((timeZones) => setTimeZones(timeZones))
-      .catch((error) => console.error(`failed to get time zones: ${error}`));
-  }, []);
-
-  const sendLinksReminder = (emailAddress?: string, phoneNumber?: string) =>
-    election
-      ?.sendLinksReminder(emailAddress, phoneNumber)
-      .catch((error) => console.error(`failed to post election reminders: ${error}`));
-
-  const onElectionDeleted = () => {
-    setElection(undefined);
-    setElectionErrorReason(ElectionErrorReason.NOTFOUND);
-  };
+  const token = useTokenRevalidation(props.loaderData?.token ?? "");
 
   if (token === "") {
     return <p>Dude, where's my token?!</p>;
-  }
-
-  if (election === undefined && electionErrorReason === undefined) {
+  } else if (props.loaderData === null || props.loaderData.token !== token) {
     return (
       <output className="spinner-border">
         <span className="visually-hidden">Loading election …</span>
       </output>
     );
-  } else if (electionErrorReason !== undefined) {
-    switch (electionErrorReason) {
-      case ElectionErrorReason.ACCESSDENIED:
-        return <p>Forbidden</p>;
-      case ElectionErrorReason.NOTFOUND:
-        return <p>Not Found</p>;
-      case ElectionErrorReason.PRIVATEACCESS:
-        return <p>Gone</p>;
-      default:
-        return <p>{electionErrorReason}</p>;
-    }
-  } else if (election) {
-    // the child routes (cf. routes.ts) render the tabs
-    const context: ElectionOutletContext = {
-      election,
-      token: token.substring(1),
-      onElectionChanged: setElection,
-      sendLinksReminder,
-      timeZones,
-      onElectionDeleted,
-      isOrganizer: token.substring(1) === election.organizerToken,
-      isBrandNew: brandNew,
-    };
+  }
 
-    return (
-      <React.Fragment>
-        <title>{election.name}</title>
-        <Outlet context={context} />
-      </React.Fragment>
-    );
-  } else {
-    return (
-      <dl>
-        <dt>assert false</dt>
-        <dd>
-          election is {election} and electionErrorReason is {electionErrorReason}
-        </dd>
-      </dl>
-    );
+  // the child routes (cf. routes.ts) read the election via useRouteLoaderData("election")
+  return (
+    <React.Fragment>
+      <title>{props.loaderData.election.name}</title>
+      <Outlet />
+    </React.Fragment>
+  );
+}
+
+export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
+  useTokenRevalidation(error instanceof ElectionLoaderError ? error.token : undefined);
+
+  if (!(error instanceof ElectionLoaderError)) {
+    throw error; // to root.tsx's ErrorBoundary
+  }
+  switch (error.reason) {
+    case ElectionErrorReason.ACCESSDENIED:
+      return <p>Forbidden</p>;
+    case ElectionErrorReason.NOTFOUND:
+      return <p>Not Found</p>;
+    case ElectionErrorReason.PRIVATEACCESS:
+      return <p>Gone</p>;
+    default:
+      return <p>{error.reason}</p>;
   }
 }
 

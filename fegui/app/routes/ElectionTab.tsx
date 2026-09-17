@@ -22,9 +22,9 @@
  * THE SOFTWARE.
  */
 
-import { useMatches, useOutletContext } from "react-router";
+import { useMatches, useRevalidator, useRouteLoaderData, useSearchParams } from "react-router";
+import type { clientLoader } from "../components/Election";
 import ElectionTabs from "../components/ElectionTabs";
-import { ElectionOutletContext } from "../props/ElectionOutletContext";
 import { ACTIVE_TAB } from "../props/ElectionTabsProps";
 
 // keyed by the route ids in routes.ts, which reuse this module for all five tabs
@@ -37,10 +37,31 @@ const ACTIVE_TABS: Record<string, ACTIVE_TAB> = {
 };
 
 function ElectionTab() {
-  const context = useOutletContext<ElectionOutletContext>();
+  const { election, timeZones, token } = useRouteLoaderData<typeof clientLoader>("election")!;
   const routeId = useMatches().at(-1)!.id;
+  const [searchParams] = useSearchParams();
+  const revalidator = useRevalidator();
 
-  return <ElectionTabs activeTab={ACTIVE_TABS[routeId]} {...context} />;
+  // until PLAN.md Stage 3c, the components mutate the election themselves and then have the election's loader revalidated
+  const reloadElection = () => revalidator.revalidate();
+  const sendLinksReminder = (emailAddress?: string, phoneNumber?: string) =>
+    election
+      .sendLinksReminder(emailAddress, phoneNumber)
+      .catch((error) => console.error(`failed to post election reminders: ${error}`));
+
+  return (
+    <ElectionTabs
+      activeTab={ACTIVE_TABS[routeId]}
+      election={election}
+      token={token}
+      onElectionChanged={reloadElection}
+      sendLinksReminder={sendLinksReminder}
+      timeZones={timeZones}
+      onElectionDeleted={reloadElection}
+      isOrganizer={token === election.organizerToken}
+      isBrandNew={searchParams.has("brandNew")}
+    />
+  );
 }
 
 export default ElectionTab;

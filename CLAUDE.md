@@ -15,7 +15,7 @@ Twotle is a web application inspired by doodle.com and meant as a teaching aid f
 
 ## Work in Progress
 
-- Retrofitting fegui as a React Router v8 framework-mode SPA with its hexagon as an npm workspace package (`fegui/hexagon`). As of 2026-09-17, Stage 1 (the hexagon package; dependency-cruiser waits for TypeScript 7.1) and Stage 2 (framework mode) are done; Stage 3 (idiomatic data APIs) is in progress in three sub-steps, of which 3a (localizations via the root `clientLoader`) is done. See [PLAN.md](PLAN.md) for the staged plan, decisions, risks, and verification steps.
+- Retrofitting fegui as a React Router v8 framework-mode SPA with its hexagon as an npm workspace package (`fegui/hexagon`). As of 2026-09-17, Stage 1 (the hexagon package; dependency-cruiser waits for TypeScript 7.1) and Stage 2 (framework mode) are done; Stage 3 (idiomatic data APIs) is in progress in three sub-steps, of which 3a (localizations via the root `clientLoader`) and 3b (composition root via `getContext`, election `clientLoader` and `ErrorBoundary`) are done. See [PLAN.md](PLAN.md) for the staged plan, decisions, risks, and verification steps.
 
 ## Conventions
 
@@ -100,9 +100,9 @@ Organized along the lines of the Ports & Adapters pattern (Hexagonal architectur
 ```
 fegui/
 ├── app/
-│   ├── root.tsx              # HTML document (Layout), localizations clientLoader, and composition root (wires FetchRepository into Factory/AntiFactory via React contexts)
+│   ├── root.tsx              # HTML document (Layout) and the localizations' clientLoader
 │   ├── routes.ts             # Route config (cf. beapi's conf/routes)
-│   ├── entry.client.tsx      # Browser entry; loads Bootstrap's JavaScript (route modules must not import it statically, as they're also evaluated in Node)
+│   ├── entry.client.tsx      # Browser entry and composition root (wires FetchRepository into Factory/AntiFactory for route modules via getContext, cf. context.ts); loads Bootstrap's JavaScript (route modules must not import it statically, as they're also evaluated in Node)
 │   ├── App.tsx               # App shell (navbar, footer, cookie consent) around the routes' <Outlet />
 │   ├── components/, props/   # React GUI (driving adapters); most components double as route modules
 │   ├── routes/               # Thin route modules where routing needs glue (redirects, election tabs)

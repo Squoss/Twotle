@@ -27,7 +27,7 @@ import { type RouteConfig, index, route } from "@react-router/dev/routes";
 // https://reactrouter.com/api/framework-conventions/routes.ts (cf. beapi's conf/routes); root.tsx wraps all of them
 export default [
   index("components/Abode.tsx"),
-  route("elections/:election", "components/Election.tsx", [
+  route("elections/:election", "components/Election.tsx", { id: "election" }, [
     index("routes/ElectionIndex.tsx"),
     route("texts", "routes/ElectionTab.tsx", { id: "election-texts" }),
     route("dats", "routes/ElectionTab.tsx", { id: "election-dats" }),

@@ -24,21 +24,13 @@
 
 import React from "react";
 import { isRouteErrorResponse, Links, Meta, Scripts, ScrollRestoration } from "react-router";
-import { AntiFactory, Factory } from "@twotle/hexagon";
 import type { Route } from "./+types/root";
-import { antiFactoryContext } from "./antiFactoryContext";
 import App from "./App";
-import { factoryContext } from "./factoryContext";
-import { FetchRepository } from "./FetchRepository";
 import { getLocalizations } from "./fetchLookups";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./index.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
-
-const repository = new FetchRepository();
-const factory = new Factory(repository);
-const antiFactory = new AntiFactory(repository);
 
 // Play replaces REPLACE_LANG and REPLACE_CSRF_TOKEN in the pre-rendered index.html per request (cf. beapi's ReactController).
 // The browser must render the replaced values; otherwise, React adds a second csrf-token <meta> (with the placeholder) while hydrating.
@@ -86,15 +78,9 @@ export async function clientLoader() {
   return { localizations: await getLocalizations() };
 }
 
-// the composition root (for now; cf. PLAN.md Stage 3)
+// the composition root is entry.client.tsx
 export default function Root() {
-  return (
-    <factoryContext.Provider value={factory}>
-      <antiFactoryContext.Provider value={antiFactory}>
-        <App />
-      </antiFactoryContext.Provider>
-    </factoryContext.Provider>
-  );
+  return <App />;
 }
 
 // pre-rendered into index.html, shown until the JavaScript has loaded

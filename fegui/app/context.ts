@@ -22,7 +22,9 @@
  * THE SOFTWARE.
  */
 
-import { ElectionTabsProps } from "./ElectionTabsProps";
+import { createContext } from "react-router";
+import type { ElectionAntiFactory, ElectionFactory } from "@twotle/hexagon";
 
-// what Election passes down to its child routes; the active tab comes from the route
-export type ElectionOutletContext = Omit<ElectionTabsProps, "activeTab">;
+// the driving ports that route modules' clientLoaders and clientActions get from React Router's context (cf. entry.client.tsx)
+export const factoryContext = createContext<ElectionFactory>();
+export const antiFactoryContext = createContext<ElectionAntiFactory>();

@@ -25,15 +25,39 @@
 // Bootstrap's JavaScript (the data API for dropdowns, collapses, and modals) needs the DOM,
 // so it's loaded here, in the browser, rather than in route modules, which are also pre-rendered at build time
 import "bootstrap";
+import { AntiFactory, Factory } from "@twotle/hexagon";
 import { startTransition, StrictMode } from "react";
 import { hydrateRoot } from "react-dom/client";
+import { RouterContextProvider } from "react-router";
 import { HydratedRouter } from "react-router/dom";
+import { antiFactoryContext as antiFactoryReactContext } from "./antiFactoryContext";
+import { antiFactoryContext, factoryContext } from "./context";
+import { factoryContext as factoryReactContext } from "./factoryContext";
+import { FetchRepository } from "./FetchRepository";
+
+// the composition root (cf. beapi's Module.scala): the driven adapter is wired into the driving adapters once
+const repository = new FetchRepository();
+const factory = new Factory(repository);
+const antiFactory = new AntiFactory(repository);
+
+// React Router calls this for each navigation and fetcher submission; route modules' clientLoaders and clientActions get the ports from it
+function getContext() {
+  const context = new RouterContextProvider();
+  context.set(factoryContext, factory);
+  context.set(antiFactoryContext, antiFactory);
+  return context;
+}
 
 startTransition(() => {
   hydrateRoot(
     document,
     <StrictMode>
-      <HydratedRouter />
+      {/* components that still mutate elections themselves get the ports via React context (until PLAN.md Stage 3c) */}
+      <factoryReactContext.Provider value={factory}>
+        <antiFactoryReactContext.Provider value={antiFactory}>
+          <HydratedRouter getContext={getContext} />
+        </antiFactoryReactContext.Provider>
+      </factoryReactContext.Provider>
     </StrictMode>
   );
 });

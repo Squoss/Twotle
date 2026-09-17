@@ -22,13 +22,14 @@
  * THE SOFTWARE.
  */
 
-import { Navigate, useOutletContext } from "react-router";
-import { ElectionOutletContext } from "../props/ElectionOutletContext";
+import { Navigate, useRouteLoaderData, useSearchParams } from "react-router";
+import type { clientLoader } from "../components/Election";
 
 function ElectionIndex() {
-  const { election, token, isOrganizer, isBrandNew } = useOutletContext<ElectionOutletContext>();
+  const { election, token } = useRouteLoaderData<typeof clientLoader>("election")!;
+  const [searchParams] = useSearchParams();
 
-  return isOrganizer && isBrandNew ? (
+  return token === election.organizerToken && searchParams.has("brandNew") ? (
     <Navigate to={`/elections/${election.id}/texts?brandNew=true#${token}`} />
   ) : (
     <Navigate to={`/elections/${election.id}/tally#${token}`} />

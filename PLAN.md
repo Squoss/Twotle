@@ -1,6 +1,6 @@
 # fegui: frontend hexagon as a subproject + retrofit to React Router v8 framework mode
 
-> **Status (2026-09-17):** Stage 1 committed (`31e3c18`), except dependency-cruiser, which waits for TypeScript 7.1. Stage 2 committed (`0906bf5`). Stage 3a done and staged (not yet committed); 3b next.
+> **Status (2026-09-17):** Stage 1 committed (`31e3c18`), except dependency-cruiser, which waits for TypeScript 7.1. Stage 2 committed (`0906bf5`). Stage 3a committed (`e98b5b5`); 3b done and staged (not yet committed); 3c next.
 
 ## Context
 
@@ -180,13 +180,29 @@ Built on React Router **8.4.0**.
   - **3b:** composition root in `entry.client.tsx` (`getContext` + router contexts), election `clientLoader` + `ErrorBoundary`, tabs via `useRouteLoaderData`.
   - **3c:** mutations as `clientAction`s, `Abode`'s create, `Legalese`'s redirect; the remaining React contexts and `onElectionChanged` props go away.
 
-**3a (done 2026-09-17, staged):**
+**3a (done 2026-09-17, committed as `e98b5b5`):**
 - **What changed:** `root.tsx` has a `clientLoader` returning `{ localizations }`, and its `HydrateFallback` shows until they're loaded. `app/localizations.ts` exports `useLocalizations()` (via `useRouteLoaderData("root")`), which 11 files use instead of `useContext(l10nContext)`. `I18nApp.tsx` and `l10nContext.tsx` are gone.
 - **Verified:**
   - `npm run build` on Windows and the Docker `react` stage (Linux pre-render)
   - against Play's production build: `inspect.mjs`, and `integration.mjs` 13/13
   - against the dev server: smoke 14/15 (the known flaw in the test), encoding 5/5, integration 13/13
   - The first smoke run hit Vite's "504 Outdated Optimize Dep" on a freshly started dev server; the rerun passed.
+
+**3b (done 2026-09-17, staged):**
+- **Composition root:** `entry.client.tsx` builds `FetchRepository`/`Factory`/`AntiFactory` once and passes them to `<HydratedRouter getContext>` via the router contexts in `app/context.ts`. Until 3c it also provides them through the old React contexts, for `Abode` and `ElectionSettings`. `root.tsx` no longer composes anything.
+- **Election loading:** `components/Election.tsx` (route id `election`) has a `clientLoader` that recreates the election through the router context and fetches the time zones.
+  - The tabs (`routes/ElectionTab.tsx`, `routes/ElectionIndex.tsx`) read both via `useRouteLoaderData("election")`; `props/ElectionOutletContext.ts` is gone.
+  - Until 3c, the tabs' "changed/deleted" callbacks just revalidate the loader.
+- **Errors:** the route's `ErrorBoundary` renders Forbidden/Not Found/Gone; other errors go on to `root.tsx`'s.
+- **Deviation from the plan:** the loader throws the domain's `ElectionError` (as `ElectionLoaderError`, which remembers the token) rather than `data(null, { status })`, so nothing HTTP-specific reaches the GUI.
+- **The capability token (a finding):**
+  - React Router strips the fragment from the loader's `request.url`, although `new Request(url).url` keeps it.
+  - During client-side navigations `window.location` is still the previous URL, so creating an election first showed "Dude, where's my token?!".
+  - **Fix:** the loader reads `window.location.hash` and returns the token it used. `useTokenRevalidation` revalidates whenever the location's token differs, which covers a stale navigation as well as fragment-only changes (e.g. to the voters' link), which React Router ignores. The "Loading election …" spinner shows meanwhile.
+- **Verified:**
+  - `npm run build` on Windows and the Docker `react` stage
+  - against Play's production build: `inspect.mjs`, `integration.mjs` 13/13, and the new `tokens.mjs` 5/5 (fragment-only switch to the voter token, to a bogus token and back, URL without fragment)
+  - against the dev server: smoke 14/15 (the known flaw in the test), encoding 5/5, integration 13/13, tokens 5/5
 
 1. **Composition root (the `Module.scala` analogue):** `app/entry.client.tsx` (which already exists for Bootstrap) builds `FetchRepository`/`Factory`/`AntiFactory` once. It seeds them with `getContext()` → `RouterContextProvider` + `createContext<ElectionFactory>()` etc. This replaces `factoryContext.ts`, `antiFactoryContext.ts` and the providers in `root.tsx`.
 2. **Localizations:** a root `clientLoader` fetches them via `fetchLookups.getLocalizations`. `useRouteLoaderData("root")` or a small `useL10n()` hook replaces `I18nApp.tsx` and `l10nContext`.
@@ -199,7 +215,7 @@ Built on React Router **8.4.0**.
 
 ## Risks / things to check during implementation
 
-- **Capability token lives in the URL fragment** (`#token`). A `clientLoader`'s `request.url` likely excludes the fragment. Read `window.location.hash` inside the loader instead, and check that hash-only navigations between organizer/voter links revalidate (add `shouldRevalidate` if not).
+- *Resolved in Stage 3b:* the capability token lives in the URL fragment, which the loader's `request.url` lacks. See 3b above for how `useTokenRevalidation` handles stale navigations and fragment-only changes.
 - **Route modules that are plain components** (e.g. `Abode`, `Election`) receive React Router's route props (`params`, `loaderData`, `matches`, …). Their `console.log(JSON.stringify(props))` now logs those; watch for circular values once loaders return entities.
 - **Workspace hoisting:** until dependency-cruiser runs, nothing stops the hexagon from importing React.
 - *Resolved in Stage 2:* the Node pre-render and Bootstrap (see `entry.client.tsx`), and `base: "/fegui/"` vs. `basename: "/"` (build-only `base`).
