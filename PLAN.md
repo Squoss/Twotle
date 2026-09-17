@@ -1,6 +1,6 @@
 # fegui: frontend hexagon as a subproject + retrofit to React Router v8 framework mode
 
-> **Status (2026-09-15):** Stage 1 committed (`31e3c18`), except dependency-cruiser, which waits for TypeScript 7.1. Stage 2 done and staged (not yet committed). Next step: Stage 3.
+> **Status (2026-09-17):** Stage 1 committed (`31e3c18`), except dependency-cruiser, which waits for TypeScript 7.1. Stage 2 committed (`0906bf5`). Next step: Stage 3.
 
 ## Context
 
@@ -162,7 +162,10 @@ Built on React Router **8.4.0**.
 
 **Not verified:** the Docker build (no Docker daemon).
 
-**Known backend issue (pre-existing):** `ReactController` reads `index.html` via `getResourceAsStream` without closing the stream. On Windows that keeps `target/web/.../build/index.html` locked, so Play dev reloads fail with `AccessDeniedException` once `public/build` changes. For a production-like local test, copy the build into `beapi/public/build` *before* starting Play.
+**Pre-existing backend issue, fixed after Stage 2:**
+- **The problem:** `ReactController` read `index.html` via `getResourceAsStream` without closing the stream. On Windows that kept `target/web/.../build/index.html` locked, so Play dev reloads failed with `AccessDeniedException` once `public/build` changed.
+- **The fix:** it now reads the file with `Using.resource(Source.fromResource(…))`.
+- **Verified on Windows:** after `ReactController` had read `index.html`, sbt-web replaced the file in `target/web` while Play kept running, without errors.
 
 ### Stage 3: Idiomatic data layer (the "elegant" part)
 
@@ -193,7 +196,7 @@ Built on React Router **8.4.0**.
 - **New fegui files (Stage 3 and later):** `.dependency-cruiser.cjs` (once TS 7.1 is out)
 - **Elsewhere:**
   - `Dockerfile`, `.github/workflows/test.yml`, `.github/workflows/scan.yml`
-  - `beapi/app/controllers/gui/ReactController.scala` (see the known issue above)
+  - `beapi/app/controllers/gui/ReactController.scala` (CSP nonces; closes the `index.html` stream)
   - `CLAUDE.md`
 
 ## Verification (per stage)
@@ -216,6 +219,6 @@ Built on React Router **8.4.0**.
      - switch the locale de/en and toggle dark mode
      - reload deep links
      - check `/legalese` redirect, `/prices`, and an unknown path
-4. **Production-like:** `docker build .` and run it, or locally copy `fegui/build/client` into `beapi/public/build` before starting Play (restore the tracked placeholder `index.html` afterwards). Hit a deep link such as `/elections/<id>/tally#<token>` directly so the Play-served `index.html` and `/fegui/` assets are exercised with a real CSRF token (POST/PUT succeed).
+4. **Production-like:** `docker build .` and run it, or locally copy `fegui/build/client` into `beapi/public/build` before starting Play, because `ReactController` keeps `index.html` in memory until Play reloads (restore the tracked placeholder `index.html` afterwards). Hit a deep link such as `/elections/<id>/tally#<token>` directly so the Play-served `index.html` and `/fegui/` assets are exercised with a real CSRF token (POST/PUT succeed).
 5. **Backend:** `cd beapi && sbt test` (ArchUnit) if `ReactController` changed.
 6. **Git:** stage after each stage and stop before committing, so Paul can review.

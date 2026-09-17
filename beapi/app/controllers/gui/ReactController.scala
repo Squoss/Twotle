@@ -37,6 +37,7 @@ import views.html.helper.CSPNonce
 
 import scala.io.Codec
 import scala.io.Source
+import scala.util.Using
 
 @Singleton
 class ReactController @Inject() (
@@ -45,10 +46,10 @@ class ReactController @Inject() (
 ) extends BaseController
     with I18nSupport {
 
-  val is = env.classLoader.getResourceAsStream("public/build/index.html")
-  val indexHtml = Source
-    .fromInputStream(is)(using Codec.UTF8)
-    .mkString // or use java.nio.Files, cf. Scala for the Impatient (§9.2) and https://horstmann.com/unblog/2023-04-09/index.html
+  // Using closes the underlying stream, which on Windows would otherwise keep Play's dev mode from replacing index.html once public/build changes
+  val indexHtml = Using.resource(
+    Source.fromResource("public/build/index.html", env.classLoader)(using Codec.UTF8)
+  )(_.mkString) // or use java.nio.Files, cf. Scala for the Impatient (§9.2) and https://horstmann.com/unblog/2023-04-09/index.html
 
   def guiFile(reactFile: String) = Action { implicit request: Request[AnyContent] =>
     implicit val ec: scala.concurrent.ExecutionContext =
