@@ -22,9 +22,12 @@
  * THE SOFTWARE.
  */
 
-import { useMatches, useRevalidator, useRouteLoaderData, useSearchParams } from "react-router";
+import { useMatches, useRouteLoaderData, useSearchParams } from "react-router";
+import type { Route } from "./+types/ElectionTab";
 import type { clientLoader } from "../components/Election";
 import ElectionTabs from "../components/ElectionTabs";
+import { antiFactoryContext, factoryContext } from "../context";
+import { ElectionIntent } from "../props/ElectionIntent";
 import { ACTIVE_TAB } from "../props/ElectionTabsProps";
 
 // keyed by the route ids in routes.ts, which reuse this module for all five tabs
@@ -36,28 +39,66 @@ const ACTIVE_TABS: Record<string, ACTIVE_TAB> = {
   "election-settings": ACTIVE_TAB.SETTINGS,
 };
 
+// the tabs' mutations (cf. useElectionSubmit); afterwards, React Router revalidates the election's loader
+export async function clientAction({ params, request, context }: Route.ClientActionArgs) {
+  const intent: ElectionIntent = await request.json();
+  const token = window.location.hash.substring(1); // the capability token (cf. components/Election.tsx)
+
+  try {
+    if (intent.intent === "destroyElection") {
+      await context.get(antiFactoryContext).destroyElection(params.election, token);
+      return null;
+    }
+
+    const election = await context
+      .get(factoryContext)
+      .recreateElection(params.election, token, Intl.DateTimeFormat().resolvedOptions().timeZone);
+    switch (intent.intent) {
+      case "updateElectionText":
+        await election.updateElectionText(intent.name, intent.description);
+        break;
+      case "updateElectionSchedule":
+        await election.updateElectionSchedule(intent.candidates, intent.timeZone);
+        break;
+      case "updateElectionSubscriptions":
+        await election.updateElectionSubscriptions(intent.emailAddress, intent.phoneNumber);
+        break;
+      case "updateElectionVisibility":
+        await election.updateElectionVisibility(intent.visibility);
+        break;
+      case "castVote":
+        await election.castVote(token, intent.name, new Map(Object.entries(intent.availability)), intent.timeZone);
+        break;
+      case "revokeVote":
+        // passes on the timestamp as received from Play (the Vote value object's Date type notwithstanding)
+        await election.revokeVote(token, intent.name, intent.voted as unknown as Date);
+        break;
+      case "sendLinksReminder":
+        await election.sendLinksReminder(intent.emailAddress, intent.phoneNumber);
+        break;
+      default: {
+        // https://www.typescriptlang.org/docs/handbook/2/narrowing.html#exhaustiveness-checking
+        const _exhaustiveCheck: never = intent;
+        return _exhaustiveCheck;
+      }
+    }
+  } catch (error) {
+    console.error(`failed to ${intent.intent}: ${error}`);
+  }
+  return null;
+}
+
 function ElectionTab() {
   const { election, timeZones, token } = useRouteLoaderData<typeof clientLoader>("election")!;
   const routeId = useMatches().at(-1)!.id;
   const [searchParams] = useSearchParams();
-  const revalidator = useRevalidator();
-
-  // until PLAN.md Stage 3c, the components mutate the election themselves and then have the election's loader revalidated
-  const reloadElection = () => revalidator.revalidate();
-  const sendLinksReminder = (emailAddress?: string, phoneNumber?: string) =>
-    election
-      .sendLinksReminder(emailAddress, phoneNumber)
-      .catch((error) => console.error(`failed to post election reminders: ${error}`));
 
   return (
     <ElectionTabs
       activeTab={ACTIVE_TABS[routeId]}
       election={election}
       token={token}
-      onElectionChanged={reloadElection}
-      sendLinksReminder={sendLinksReminder}
       timeZones={timeZones}
-      onElectionDeleted={reloadElection}
       isOrganizer={token === election.organizerToken}
       isBrandNew={searchParams.has("brandNew")}
     />

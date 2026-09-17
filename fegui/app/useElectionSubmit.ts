@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright (c) 2021-2026 Squeng AG
+ * Copyright (c) 2026 Squeng AG
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,7 +22,12 @@
  * THE SOFTWARE.
  */
 
-import React from "react";
-import { ElectionAntiFactory } from "@twotle/hexagon";
+import { useFetcher } from "react-router";
+import { ElectionIntent } from "./props/ElectionIntent";
 
-export const antiFactoryContext = React.createContext<ElectionAntiFactory | null>(null);
+// submits to the election tab route's clientAction (cf. routes/ElectionTab.tsx), after which React Router revalidates the election's loader
+export function useElectionSubmit() {
+  const fetcher = useFetcher();
+
+  return (intent: ElectionIntent) => fetcher.submit(intent, { method: "post", encType: "application/json" });
+}

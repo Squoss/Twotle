@@ -24,6 +24,7 @@
 
 import React, { useState } from "react";
 import { useLocalizations } from "../localizations";
+import { useElectionSubmit } from "../useElectionSubmit";
 import { ElectionTextsProps } from "../props/ElectionTextsProps";
 
 function tte(s?: string) {
@@ -40,6 +41,7 @@ function ElectionTexts(props: Readonly<ElectionTextsProps>) {
   console.log("ElectionTexts props: " + JSON.stringify(props));
 
   const localizations = useLocalizations();
+  const submit = useElectionSubmit();
 
   const [name, setName] = useState(props.election.name);
   const [description, setDescription] = useState(
@@ -54,9 +56,7 @@ function ElectionTexts(props: Readonly<ElectionTextsProps>) {
 
   const saveText = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
-    props.election.updateElectionText(name.trim(), ttu(description))
-      .then((updated) => props.onElectionChanged(updated))
-      .catch((error) => console.error(`failed to put election text: ${error}`));
+    submit({ intent: "updateElectionText", name: name.trim(), description: ttu(description) });
   };
 
   const changesSaved = () =>

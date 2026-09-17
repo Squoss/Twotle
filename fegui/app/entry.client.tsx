@@ -30,9 +30,7 @@ import { startTransition, StrictMode } from "react";
 import { hydrateRoot } from "react-dom/client";
 import { RouterContextProvider } from "react-router";
 import { HydratedRouter } from "react-router/dom";
-import { antiFactoryContext as antiFactoryReactContext } from "./antiFactoryContext";
 import { antiFactoryContext, factoryContext } from "./context";
-import { factoryContext as factoryReactContext } from "./factoryContext";
 import { FetchRepository } from "./FetchRepository";
 
 // the composition root (cf. beapi's Module.scala): the driven adapter is wired into the driving adapters once
@@ -52,12 +50,7 @@ startTransition(() => {
   hydrateRoot(
     document,
     <StrictMode>
-      {/* components that still mutate elections themselves get the ports via React context (until PLAN.md Stage 3c) */}
-      <factoryReactContext.Provider value={factory}>
-        <antiFactoryReactContext.Provider value={antiFactory}>
-          <HydratedRouter getContext={getContext} />
-        </antiFactoryReactContext.Provider>
-      </factoryReactContext.Provider>
+      <HydratedRouter getContext={getContext} />
     </StrictMode>
   );
 });

@@ -27,6 +27,7 @@ import { DayPicker } from "@daypicker/react";
 import { de, enUS } from "@daypicker/react/locale";
 import "@daypicker/react/style.css";
 import { useLocalizations } from "../localizations";
+import { useElectionSubmit } from "../useElectionSubmit";
 import { ElectionCandidatesProps } from "../props/ElectionCandidatesProps";
 
 // Use local date parts to avoid UTC/local timezone offset issues
@@ -72,6 +73,7 @@ function ttu(s?: string) {
 
 function ElectionCandidates(props: Readonly<ElectionCandidatesProps>) {
   const localizations = useLocalizations();
+  const submit = useElectionSubmit();
   const locale = localizations["locale"] === "de" ? de : enUS;
 
   const [schedule, setSchedule] = useState<Record<string, string[]>>(parseCandidates(props.election.candidates));
@@ -129,10 +131,7 @@ function ElectionCandidates(props: Readonly<ElectionCandidatesProps>) {
 
   const saveSchedule = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    props.election
-      .updateElectionSchedule(candidates, ttu(timeZone))
-      .then((updated) => props.onElectionChanged(updated))
-      .catch((error) => console.error(`failed to put election schedule: ${error}`));
+    submit({ intent: "updateElectionSchedule", candidates, timeZone: ttu(timeZone) });
   };
 
   const timeZoneOptions = props.timeZones.map((tz) => (

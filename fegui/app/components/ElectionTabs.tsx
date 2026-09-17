@@ -45,7 +45,6 @@ function ElectionTabs(props: Readonly<ElectionTabsProps>) {
       content = (
         <ElectionTexts
           election={props.election}
-          onElectionChanged={props.onElectionChanged}
         />
       );
       break;
@@ -54,7 +53,6 @@ function ElectionTabs(props: Readonly<ElectionTabsProps>) {
         <ElectionCandidates
           election={props.election}
           timeZones={props.timeZones}
-          onElectionChanged={props.onElectionChanged}
         />
       );
       break;
@@ -65,7 +63,6 @@ function ElectionTabs(props: Readonly<ElectionTabsProps>) {
           nrOfCandidates={props.election.candidates.length}
           organizerToken={organizerToken}
           voterToken={voterToken}
-          sendLinksReminder={props.sendLinksReminder}
         />
       );
       break;
@@ -75,7 +72,6 @@ function ElectionTabs(props: Readonly<ElectionTabsProps>) {
           election={props.election}
           token={props.token}
           timeZones={props.timeZones}
-          onElectionChanged={props.onElectionChanged}
         />
       );
       break;
@@ -83,8 +79,6 @@ function ElectionTabs(props: Readonly<ElectionTabsProps>) {
       content = (
         <ElectionSettings
           election={props.election}
-          onElectionChanged={props.onElectionChanged}
-          onElectionDeleted={props.onElectionDeleted}
         />
       );
       break;

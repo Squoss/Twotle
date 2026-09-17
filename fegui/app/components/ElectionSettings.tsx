@@ -22,18 +22,18 @@
  * THE SOFTWARE.
  */
 
-import React, { useContext, useState } from "react";
-import { antiFactoryContext } from "../antiFactoryContext";
+import React, { useState } from "react";
 import { Visibility } from "@twotle/hexagon";
 import { useLocalizations } from "../localizations";
+import { useElectionSubmit } from "../useElectionSubmit";
 import { ElectionSettingsProps } from "../props/ElectionSettingsProps";
 import useInputValidation, { InputType } from "../useInputValidation";
 
 function ElectionSettings(props: Readonly<ElectionSettingsProps>) {
   console.log("ElectionSettings props: " + JSON.stringify(props));
 
-  const antiFactory = useContext(antiFactoryContext)!;
   const localizations = useLocalizations();
+  const submit = useElectionSubmit();
 
   const [emailAddressValid, emailAddress, setEmailAddress] = useInputValidation(
     InputType.EMAILADDRESS,
@@ -60,12 +60,11 @@ function ElectionSettings(props: Readonly<ElectionSettingsProps>) {
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     e.preventDefault();
-    props.election.updateElectionSubscriptions(
-      emailAddress && emailAddress !== "" ? emailAddress : undefined,
-      phoneNumber && phoneNumber !== "" ? phoneNumber : undefined
-    )
-      .then((updated) => props.onElectionChanged(updated))
-      .catch((error) => console.error(`failed to put election subscriptions: ${error}`));
+    submit({
+      intent: "updateElectionSubscriptions",
+      emailAddress: emailAddress && emailAddress !== "" ? emailAddress : undefined,
+      phoneNumber: phoneNumber && phoneNumber !== "" ? phoneNumber : undefined,
+    });
   };
 
   const cancelVisibility = (
@@ -79,17 +78,13 @@ function ElectionSettings(props: Readonly<ElectionSettingsProps>) {
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     e.preventDefault();
-    props.election.updateElectionVisibility(visibility)
-      .then((updated) => props.onElectionChanged(updated))
-      .catch((error) => console.error(`failed to put election visibility: ${error}`));
+    submit({ intent: "updateElectionVisibility", visibility });
   };
 
   const handleDeleteElection = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     import("bootstrap").then(({ Modal }) => Modal.getInstance(document.getElementById("deleteElectionModal")!)!.hide());
-    antiFactory.destroyElection(String(props.election.id), props.election.organizerToken)
-      .then(() => props.onElectionDeleted())
-      .catch((error) => console.error(`failed to delete election: ${error}`));
+    submit({ intent: "destroyElection" });
   };
 
   const subscriptionChangesSaved = () =>

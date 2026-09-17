@@ -26,6 +26,7 @@ import React from "react";
 import { NavLink } from "react-router";
 import Clipboard from "./Clipboard";
 import { useLocalizations } from "../localizations";
+import { useElectionSubmit } from "../useElectionSubmit";
 import { ElectionLinksProps } from "../props/ElectionLinksProps";
 import useInputValidation, { InputType } from "../useInputValidation";
 
@@ -33,6 +34,7 @@ function ElectionLinks(props: Readonly<ElectionLinksProps>) {
   console.log("ElectionLinks props: " + JSON.stringify(props));
 
   const localizations = useLocalizations();
+  const submit = useElectionSubmit();
 
   const { id, nrOfCandidates, voterToken, organizerToken } = props;
 
@@ -50,14 +52,14 @@ function ElectionLinks(props: Readonly<ElectionLinksProps>) {
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     e.preventDefault();
-    props.sendLinksReminder(emailAddress, undefined);
+    submit({ intent: "sendLinksReminder", emailAddress });
   };
 
   const sendLinksReminderSms = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     e.preventDefault();
-    props.sendLinksReminder(undefined, cellPhoneNumber);
+    submit({ intent: "sendLinksReminder", phoneNumber: cellPhoneNumber });
   };
 
   return (

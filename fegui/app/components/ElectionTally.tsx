@@ -26,6 +26,7 @@ import React from "react";
 import { Vote } from "@twotle/hexagon";
 import ElectionVote from "./ElectionVote";
 import { useLocalizations } from "../localizations";
+import { useElectionSubmit } from "../useElectionSubmit";
 import { ElectionTallyProps } from "../props/ElectionTallyProps";
 
 function prettyLocalDateTimeString(locale: string, dateTime: string) {
@@ -82,6 +83,7 @@ function ElectionTally(props: Readonly<ElectionTallyProps>) {
   console.log("ElectionTally props: " + JSON.stringify(props));
 
   const localizations = useLocalizations();
+  const submit = useElectionSubmit();
 
   const { id, description, timeZone, candidates, votes } = props.election;
   candidates.sort((a,b)=>Date.parse(a)-Date.parse(b));
@@ -134,9 +136,7 @@ function ElectionTally(props: Readonly<ElectionTallyProps>) {
           )
       )
     ) {
-      props.election.revokeVote(props.token, name, voted)
-        .then((updated) => props.onElectionChanged(updated))
-        .catch((error) => console.error(`failed to revoke vote: ${error}`));
+      submit({ intent: "revokeVote", name, voted: String(voted) });
     }
   };
 
@@ -237,11 +237,7 @@ function ElectionTally(props: Readonly<ElectionTallyProps>) {
               ))}
             </tbody>
             <tfoot>
-              <ElectionVote
-                election={props.election}
-                token={props.token}
-                onElectionChanged={props.onElectionChanged}
-              />
+              <ElectionVote election={props.election} />
             </tfoot>
           </table>
         </div>

@@ -36,10 +36,7 @@ export interface ElectionTabsProps {
   election: ElectionEntity;
   token: string;
   activeTab: ACTIVE_TAB;
-  onElectionChanged: (election: ElectionEntity) => void;
-  sendLinksReminder: (emailAddress?: string, phoneNumber?: string) => void;
   timeZones: Array<string>;
-  onElectionDeleted: () => void;
   isOrganizer: boolean;
   isBrandNew: boolean;
 }

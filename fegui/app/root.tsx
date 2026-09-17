@@ -23,7 +23,7 @@
  */
 
 import React from "react";
-import { isRouteErrorResponse, Links, Meta, Scripts, ScrollRestoration } from "react-router";
+import { isRouteErrorResponse, Links, Meta, Scripts, ScrollRestoration, type ShouldRevalidateFunctionArgs } from "react-router";
 import type { Route } from "./+types/root";
 import App from "./App";
 import { getLocalizations } from "./fetchLookups";
@@ -76,6 +76,11 @@ export function Layout({ children }: Readonly<{ children: React.ReactNode }>) {
 // Play's localizations for all routes (cf. localizations.ts); HydrateFallback shows until they're loaded
 export async function clientLoader() {
   return { localizations: await getLocalizations() };
+}
+
+// the localizations don't change when an action (e.g., saving an election) completes
+export function shouldRevalidate({ formMethod, defaultShouldRevalidate }: ShouldRevalidateFunctionArgs) {
+  return formMethod === undefined && defaultShouldRevalidate;
 }
 
 // the composition root is entry.client.tsx

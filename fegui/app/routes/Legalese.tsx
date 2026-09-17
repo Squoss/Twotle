@@ -22,10 +22,9 @@
  * THE SOFTWARE.
  */
 
-import { Navigate } from "react-router";
+import { redirect } from "react-router";
 
-function Legalese() {
-  return <Navigate to="/legalese/im" />;
+// no component: /legalese only redirects to the masthead
+export async function clientLoader() {
+  return redirect("/legalese/im");
 }
-
-export default Legalese;

@@ -27,5 +27,4 @@ export interface ElectionLinksProps {
   nrOfCandidates: number;
   organizerToken: string;
   voterToken: string;
-  sendLinksReminder: (emailAddress?: string, phoneNumber?: string) => void;
 }

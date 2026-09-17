@@ -27,5 +27,4 @@ import { ElectionEntity } from "@twotle/hexagon";
 export interface ElectionCandidatesProps {
   election: ElectionEntity;
   timeZones: Array<string>;
-  onElectionChanged: (election: ElectionEntity) => void;
 }

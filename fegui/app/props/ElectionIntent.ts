@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright (c) 2021-2026 Squeng AG
+ * Copyright (c) 2026 Squeng AG
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,7 +22,16 @@
  * THE SOFTWARE.
  */
 
-import React from "react";
-import { ElectionFactory } from "@twotle/hexagon";
+import { Availability, Visibility } from "@twotle/hexagon";
 
-export const factoryContext = React.createContext<ElectionFactory | null>(null);
+// what the election tabs submit (cf. useElectionSubmit) to routes/ElectionTab.tsx's clientAction,
+// named after the ElectionEntity (or ElectionAntiFactory) method that the clientAction calls
+export type ElectionIntent =
+  | { intent: "updateElectionText"; name: string; description?: string }
+  | { intent: "updateElectionSchedule"; candidates: Array<string>; timeZone?: string }
+  | { intent: "updateElectionSubscriptions"; emailAddress?: string; phoneNumber?: string }
+  | { intent: "updateElectionVisibility"; visibility: Visibility }
+  | { intent: "castVote"; name: string; availability: Record<string, Availability>; timeZone?: string }
+  | { intent: "revokeVote"; name: string; voted: string }
+  | { intent: "sendLinksReminder"; emailAddress?: string; phoneNumber?: string }
+  | { intent: "destroyElection" };

@@ -28,5 +28,4 @@ export interface ElectionTallyProps {
   election: ElectionEntity;
   token: string;
   timeZones: Array<string>;
-  onElectionChanged: (election: ElectionEntity) => void;
 }

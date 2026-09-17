@@ -26,5 +26,4 @@ import { ElectionEntity } from "@twotle/hexagon";
 
 export interface ElectionTextsProps {
   election: ElectionEntity;
-  onElectionChanged: (election: ElectionEntity) => void;
 }

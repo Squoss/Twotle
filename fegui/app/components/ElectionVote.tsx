@@ -25,12 +25,14 @@
 import React, { useState } from "react";
 import { Availability, Visibility } from "@twotle/hexagon";
 import { useLocalizations } from "../localizations";
+import { useElectionSubmit } from "../useElectionSubmit";
 import { ElectionVoteProps } from "../props/ElectionVoteProps";
 
 function ElectionVote(props: ElectionVoteProps) {
   console.log("ElectionVote props: " + JSON.stringify(props));
 
   const localizations = useLocalizations();
+  const submit = useElectionSubmit();
 
   const { candidates } = props.election;
   candidates.sort((a, b) => Date.parse(a) - Date.parse(b));
@@ -55,9 +57,7 @@ function ElectionVote(props: ElectionVoteProps) {
 
   const saveVote = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
-    props.election.castVote(props.token, name, availability, props.election.timeZone)
-      .then((updated) => props.onElectionChanged(updated))
-      .catch((error) => console.error(`failed to cast vote: ${error}`));
+    submit({ intent: "castVote", name, availability: Object.fromEntries(availability), timeZone: props.election.timeZone });
     setName("");
     setAvailability(defaultAvailabiity);
   };

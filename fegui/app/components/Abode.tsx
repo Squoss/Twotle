@@ -22,30 +22,30 @@
  * THE SOFTWARE.
  */
 
-import React, { useContext } from "react";
-import { useNavigate } from "react-router";
-import { factoryContext } from "../factoryContext";
+import React from "react";
+import { Form, redirect } from "react-router";
+import type { Route } from "./+types/Abode";
+import { factoryContext } from "../context";
 import { useLocalizations } from "../localizations";
+
+// creates an election and redirects to its organizer's page, whose capability token is the URL's fragment (cf. Election.tsx)
+export async function clientAction({ context }: Route.ClientActionArgs) {
+  try {
+    const response = await context.get(factoryContext).createElection();
+    return redirect(`/elections/${response.id}?brandNew=true#${response.organizerToken}`);
+  } catch (error) {
+    console.error(`failed to post election: ${error}`);
+    return null;
+  }
+}
 
 function Abode(props: {}) {
   console.log("Abode props: " + JSON.stringify(props));
 
-  const factory = useContext(factoryContext)!;
   const localizations = useLocalizations();
 
-  const navigate = useNavigate();
-
-  const handlePostElection = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const hidePostElectionModal = () => {
     import("bootstrap").then(({ Modal }) => Modal.getInstance(document.getElementById("postElectionModal")!)!.hide());
-    factory
-      .createElection()
-      .then((response) => {
-        navigate(
-          `/elections/${response.id}?brandNew=true#${response.organizerToken}`
-        );
-      })
-      .catch((error) => console.error(`failed to post election: ${error}`));
   };
 
   return (
@@ -97,11 +97,11 @@ function Abode(props: {}) {
               >
                 {localizations["no"]}
               </button>
-              <form onSubmit={handlePostElection}>
+              <Form method="post" onSubmit={hidePostElectionModal}>
                 <button type="submit" className="btn btn-primary">
                   {localizations["yes"]}
                 </button>
-              </form>
+              </Form>
             </div>
           </div>
         </div>
