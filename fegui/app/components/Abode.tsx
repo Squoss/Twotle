@@ -25,13 +25,13 @@
 import React, { useContext } from "react";
 import { useNavigate } from "react-router";
 import { factoryContext } from "../factoryContext";
-import { l10nContext } from "../l10nContext";
+import { useLocalizations } from "../localizations";
 
 function Abode(props: {}) {
   console.log("Abode props: " + JSON.stringify(props));
 
   const factory = useContext(factoryContext)!;
-  const localizations = useContext(l10nContext);
+  const localizations = useLocalizations();
 
   const navigate = useNavigate();
 

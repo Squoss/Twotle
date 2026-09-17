@@ -30,7 +30,7 @@ import { antiFactoryContext } from "./antiFactoryContext";
 import App from "./App";
 import { factoryContext } from "./factoryContext";
 import { FetchRepository } from "./FetchRepository";
-import I18nApp from "./I18nApp";
+import { getLocalizations } from "./fetchLookups";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./index.css";
@@ -81,14 +81,17 @@ export function Layout({ children }: Readonly<{ children: React.ReactNode }>) {
   );
 }
 
+// Play's localizations for all routes (cf. localizations.ts); HydrateFallback shows until they're loaded
+export async function clientLoader() {
+  return { localizations: await getLocalizations() };
+}
+
 // the composition root (for now; cf. PLAN.md Stage 3)
 export default function Root() {
   return (
     <factoryContext.Provider value={factory}>
       <antiFactoryContext.Provider value={antiFactory}>
-        <I18nApp>
-          <App />
-        </I18nApp>
+        <App />
       </antiFactoryContext.Provider>
     </factoryContext.Provider>
   );

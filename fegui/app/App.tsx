@@ -22,14 +22,14 @@
  * THE SOFTWARE.
  */
 
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, NavLink, Outlet, useLocation } from "react-router";
-import { l10nContext } from "./l10nContext";
+import { useLocalizations } from "./localizations";
 
 function App(props: {}) {
   console.log("App props: " + JSON.stringify(props));
 
-  const localizations = useContext(l10nContext);
+  const localizations = useLocalizations();
 
   const location = useLocation();
   let locationString = location.pathname;

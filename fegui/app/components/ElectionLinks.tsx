@@ -22,17 +22,17 @@
  * THE SOFTWARE.
  */
 
-import React, { useContext } from "react";
+import React from "react";
 import { NavLink } from "react-router";
 import Clipboard from "./Clipboard";
-import { l10nContext } from "../l10nContext";
+import { useLocalizations } from "../localizations";
 import { ElectionLinksProps } from "../props/ElectionLinksProps";
 import useInputValidation, { InputType } from "../useInputValidation";
 
 function ElectionLinks(props: Readonly<ElectionLinksProps>) {
   console.log("ElectionLinks props: " + JSON.stringify(props));
 
-  const localizations = useContext(l10nContext);
+  const localizations = useLocalizations();
 
   const { id, nrOfCandidates, voterToken, organizerToken } = props;
 

@@ -22,11 +22,11 @@
  * THE SOFTWARE.
  */
 
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import { DayPicker } from "@daypicker/react";
 import { de, enUS } from "@daypicker/react/locale";
 import "@daypicker/react/style.css";
-import { l10nContext } from "../l10nContext";
+import { useLocalizations } from "../localizations";
 import { ElectionCandidatesProps } from "../props/ElectionCandidatesProps";
 
 // Use local date parts to avoid UTC/local timezone offset issues
@@ -71,7 +71,7 @@ function ttu(s?: string) {
 }
 
 function ElectionCandidates(props: Readonly<ElectionCandidatesProps>) {
-  const localizations = useContext(l10nContext);
+  const localizations = useLocalizations();
   const locale = localizations["locale"] === "de" ? de : enUS;
 
   const [schedule, setSchedule] = useState<Record<string, string[]>>(parseCandidates(props.election.candidates));

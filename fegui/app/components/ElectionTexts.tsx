@@ -22,8 +22,8 @@
  * THE SOFTWARE.
  */
 
-import React, { useContext, useState } from "react";
-import { l10nContext } from "../l10nContext";
+import React, { useState } from "react";
+import { useLocalizations } from "../localizations";
 import { ElectionTextsProps } from "../props/ElectionTextsProps";
 
 function tte(s?: string) {
@@ -39,7 +39,7 @@ function ttu(s?: string) {
 function ElectionTexts(props: Readonly<ElectionTextsProps>) {
   console.log("ElectionTexts props: " + JSON.stringify(props));
 
-  const localizations = useContext(l10nContext);
+  const localizations = useLocalizations();
 
   const [name, setName] = useState(props.election.name);
   const [description, setDescription] = useState(

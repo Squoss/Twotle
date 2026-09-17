@@ -25,7 +25,7 @@
 import React, { useContext, useState } from "react";
 import { antiFactoryContext } from "../antiFactoryContext";
 import { Visibility } from "@twotle/hexagon";
-import { l10nContext } from "../l10nContext";
+import { useLocalizations } from "../localizations";
 import { ElectionSettingsProps } from "../props/ElectionSettingsProps";
 import useInputValidation, { InputType } from "../useInputValidation";
 
@@ -33,7 +33,7 @@ function ElectionSettings(props: Readonly<ElectionSettingsProps>) {
   console.log("ElectionSettings props: " + JSON.stringify(props));
 
   const antiFactory = useContext(antiFactoryContext)!;
-  const localizations = useContext(l10nContext);
+  const localizations = useLocalizations();
 
   const [emailAddressValid, emailAddress, setEmailAddress] = useInputValidation(
     InputType.EMAILADDRESS,

@@ -22,13 +22,13 @@
  * THE SOFTWARE.
  */
 
-import React, { useContext } from "react";
-import { l10nContext } from "../l10nContext";
+import React from "react";
+import { useLocalizations } from "../localizations";
 
 function Prices(props: {}) {
   console.log("Prices props: " + JSON.stringify(props));
 
-  const localizations = useContext(l10nContext);
+  const localizations = useLocalizations();
 
   return (
     <React.Fragment>

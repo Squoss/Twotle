@@ -1,6 +1,6 @@
 # fegui: frontend hexagon as a subproject + retrofit to React Router v8 framework mode
 
-> **Status (2026-09-17):** Stage 1 committed (`31e3c18`), except dependency-cruiser, which waits for TypeScript 7.1. Stage 2 committed (`0906bf5`). Next step: Stage 3.
+> **Status (2026-09-17):** Stage 1 committed (`31e3c18`), except dependency-cruiser, which waits for TypeScript 7.1. Stage 2 committed (`0906bf5`). Stage 3a done and staged (not yet committed); 3b next.
 
 ## Context
 
@@ -172,6 +172,21 @@ Built on React Router **8.4.0**.
 - **Verified on Windows:** after `ReactController` had read `index.html`, sbt-web replaced the file in `target/web` while Play kept running, without errors.
 
 ### Stage 3: Idiomatic data layer (the "elegant" part)
+
+**Paul's decisions (2026-09-17):**
+- **Mutations** (texts, dates, subscriptions, visibility, votes, reminders, delete, create) become `clientAction`s called via `useFetcher`. The action gets the factory from the router context, recreates the entity and calls its method, and React Router revalidates the election loader. Components become views; route modules are the driving adapters. Each save costs GET + PUT + a revalidating GET.
+- **Three sub-steps**, each verified, staged and paused for review:
+  - **3a:** localizations via a root `clientLoader` and `useLocalizations()`, replacing `I18nApp`/`l10nContext`.
+  - **3b:** composition root in `entry.client.tsx` (`getContext` + router contexts), election `clientLoader` + `ErrorBoundary`, tabs via `useRouteLoaderData`.
+  - **3c:** mutations as `clientAction`s, `Abode`'s create, `Legalese`'s redirect; the remaining React contexts and `onElectionChanged` props go away.
+
+**3a (done 2026-09-17, staged):**
+- **What changed:** `root.tsx` has a `clientLoader` returning `{ localizations }`, and its `HydrateFallback` shows until they're loaded. `app/localizations.ts` exports `useLocalizations()` (via `useRouteLoaderData("root")`), which 11 files use instead of `useContext(l10nContext)`. `I18nApp.tsx` and `l10nContext.tsx` are gone.
+- **Verified:**
+  - `npm run build` on Windows and the Docker `react` stage (Linux pre-render)
+  - against Play's production build: `inspect.mjs`, and `integration.mjs` 13/13
+  - against the dev server: smoke 14/15 (the known flaw in the test), encoding 5/5, integration 13/13
+  - The first smoke run hit Vite's "504 Outdated Optimize Dep" on a freshly started dev server; the rerun passed.
 
 1. **Composition root (the `Module.scala` analogue):** `app/entry.client.tsx` (which already exists for Bootstrap) builds `FetchRepository`/`Factory`/`AntiFactory` once. It seeds them with `getContext()` → `RouterContextProvider` + `createContext<ElectionFactory>()` etc. This replaces `factoryContext.ts`, `antiFactoryContext.ts` and the providers in `root.tsx`.
 2. **Localizations:** a root `clientLoader` fetches them via `fetchLookups.getLocalizations`. `useRouteLoaderData("root")` or a small `useL10n()` hook replaces `I18nApp.tsx` and `l10nContext`.

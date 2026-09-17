@@ -15,7 +15,7 @@ Twotle is a web application inspired by doodle.com and meant as a teaching aid f
 
 ## Work in Progress
 
-- Retrofitting fegui as a React Router v8 framework-mode SPA with its hexagon as an npm workspace package (`fegui/hexagon`). As of 2026-09-15, Stage 1 (the hexagon package) is done except for dependency-cruiser, which waits for TypeScript 7.1; Stage 2 (framework mode) is done; Stage 3 (idiomatic data APIs) is next. See [PLAN.md](PLAN.md) for the staged plan, decisions, risks, and verification steps.
+- Retrofitting fegui as a React Router v8 framework-mode SPA with its hexagon as an npm workspace package (`fegui/hexagon`). As of 2026-09-17, Stage 1 (the hexagon package; dependency-cruiser waits for TypeScript 7.1) and Stage 2 (framework mode) are done; Stage 3 (idiomatic data APIs) is in progress in three sub-steps, of which 3a (localizations via the root `clientLoader`) is done. See [PLAN.md](PLAN.md) for the staged plan, decisions, risks, and verification steps.
 
 ## Conventions
 
@@ -93,14 +93,14 @@ The following rules are enforced by `sbt test`:
 
 React SPA built with React Router v8 in framework mode (`ssr: false`, cf. `react-router.config.ts`). `app/routes.ts` maps URLs to route modules (cf. beapi's `conf/routes`), and `app/root.tsx` renders the HTML document. The build pre-renders `build/client/index.html`, which Play serves for all non-API paths after replacing its `REPLACE_LANG` and `REPLACE_CSRF_TOKEN` placeholders and adding the request's CSP nonce to its inline scripts (cf. `ReactController` and `script-src` in `application.conf`); the assets are served under `/fegui/`.
 
-Internationalization/Localization (cf. `l10nContext.tsx`) is based on the backend (i.e., on Play's i18n/l10n support).
+Internationalization/Localization is based on the backend (i.e., on Play's i18n/l10n support): the root route's `clientLoader` fetches the messages once, and components read them via `useLocalizations()` (cf. `app/localizations.ts`).
 
 Organized along the lines of the Ports & Adapters pattern (Hexagonal architecture), mirroring the backend:
 
 ```
 fegui/
 ├── app/
-│   ├── root.tsx              # HTML document (Layout) and composition root (wires FetchRepository into Factory/AntiFactory via React contexts)
+│   ├── root.tsx              # HTML document (Layout), localizations clientLoader, and composition root (wires FetchRepository into Factory/AntiFactory via React contexts)
 │   ├── routes.ts             # Route config (cf. beapi's conf/routes)
 │   ├── entry.client.tsx      # Browser entry; loads Bootstrap's JavaScript (route modules must not import it statically, as they're also evaluated in Node)
 │   ├── App.tsx               # App shell (navbar, footer, cookie consent) around the routes' <Outlet />

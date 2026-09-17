@@ -22,20 +22,20 @@
  * THE SOFTWARE.
  */
 
-import React, { useContext } from "react";
+import React from "react";
 import { NavLink } from "react-router";
 import ElectionCandidates from "./ElectionCandidates";
 import ElectionLinks from "./ElectionLinks";
 import ElectionSettings from "./ElectionSettings";
 import ElectionTally from "./ElectionTally";
 import ElectionTexts from "./ElectionTexts";
-import { l10nContext } from "../l10nContext";
+import { useLocalizations } from "../localizations";
 import { ACTIVE_TAB, ElectionTabsProps } from "../props/ElectionTabsProps";
 
 function ElectionTabs(props: Readonly<ElectionTabsProps>) {
   console.log("ElectionTabs props: " + JSON.stringify(props));
 
-  const localizations = useContext(l10nContext);
+  const localizations = useLocalizations();
 
   const { id, voterToken, organizerToken, name } = props.election;
 

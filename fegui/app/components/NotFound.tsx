@@ -22,14 +22,13 @@
  * THE SOFTWARE.
  */
 
-import { useContext } from "react";
 import { Link } from "react-router";
-import { l10nContext } from "../l10nContext";
+import { useLocalizations } from "../localizations";
 
 function NotFound(props: {}) {
   console.log("NotFound props: " + JSON.stringify(props));
 
-  const localizations = useContext(l10nContext);
+  const localizations = useLocalizations();
 
   return (
     <div className="alert alert-info" role="alert">

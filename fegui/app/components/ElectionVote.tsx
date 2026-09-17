@@ -22,15 +22,15 @@
  * THE SOFTWARE.
  */
 
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import { Availability, Visibility } from "@twotle/hexagon";
-import { l10nContext } from "../l10nContext";
+import { useLocalizations } from "../localizations";
 import { ElectionVoteProps } from "../props/ElectionVoteProps";
 
 function ElectionVote(props: ElectionVoteProps) {
   console.log("ElectionVote props: " + JSON.stringify(props));
 
-  const localizations = useContext(l10nContext);
+  const localizations = useLocalizations();
 
   const { candidates } = props.election;
   candidates.sort((a, b) => Date.parse(a) - Date.parse(b));

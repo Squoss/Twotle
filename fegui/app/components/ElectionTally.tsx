@@ -22,10 +22,10 @@
  * THE SOFTWARE.
  */
 
-import React, { useContext } from "react";
+import React from "react";
 import { Vote } from "@twotle/hexagon";
 import ElectionVote from "./ElectionVote";
-import { l10nContext } from "../l10nContext";
+import { useLocalizations } from "../localizations";
 import { ElectionTallyProps } from "../props/ElectionTallyProps";
 
 function prettyLocalDateTimeString(locale: string, dateTime: string) {
@@ -81,7 +81,7 @@ function columnBest(columnCounts: Array<[number, number, number]>) {
 function ElectionTally(props: Readonly<ElectionTallyProps>) {
   console.log("ElectionTally props: " + JSON.stringify(props));
 
-  const localizations = useContext(l10nContext);
+  const localizations = useLocalizations();
 
   const { id, description, timeZone, candidates, votes } = props.election;
   candidates.sort((a,b)=>Date.parse(a)-Date.parse(b));
