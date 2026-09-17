@@ -144,6 +144,10 @@ Built on React Router **8.4.0**.
 **Gotchas:**
 - **Install order:** `npm install` with the new `package.json` and the old lock fails with ERESOLVE; `npm uninstall react-router-dom @vitejs/plugin-react` first, then install.
 - **No concurrent dev server:** don't run a dev server while `react-router typegen`/`npm install` might install something; Windows file locks gutted `node_modules` once.
+- **Docker pre-render (broke GHCR delivery and Clever Cloud deployment of `0906bf5`):**
+  - **Cause:** `react-router build` pre-renders via a Vite preview server bound to `localhost`. In the `node:24` image that resolves to `::1`, but the pre-render requests `127.0.0.1`, so the build failed with `ECONNREFUSED`.
+  - **Why CI missed it:** the Test workflow never runs `npm run build`.
+  - **Fix:** `preview.host: '127.0.0.1'` in `vite.config.ts`.
 
 **Verified:**
 - **`npm run typecheck` and `npm run build`:**
@@ -160,7 +164,7 @@ Built on React Router **8.4.0**.
 - **Backend:** `sbt test` passes (27 + 9 tests).
 - **`npm run serve` (`vite preview`): removed.** It answered every path, assets under `/fegui/vrassets/` included, with `index.html`. Only Play splits assets (under `/fegui/`) from app routes, so a production-like check needs Play (see Verification 4).
 
-**Not verified:** the Docker build (no Docker daemon).
+**Docker build:** with the pre-render fix, `docker build .` succeeds locally (Docker Desktop), including the frontend pre-render and `sbt stage`. The container itself wasn't run.
 
 **Pre-existing backend issue, fixed after Stage 2:**
 - **The problem:** `ReactController` read `index.html` via `getResourceAsStream` without closing the stream. On Windows that kept `target/web/.../build/index.html` locked, so Play dev reloads failed with `AccessDeniedException` once `public/build` changed.

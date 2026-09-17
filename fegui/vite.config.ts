@@ -10,6 +10,11 @@ export default defineConfig(({ command }) => {
       assetsDir: 'vrassets',
     },
     plugins: [reactRouter()],
+    preview: {
+      // react-router build pre-renders via a preview server that binds to localhost, which in node:24 containers resolves to ::1,
+      // whereas the pre-render requests go to 127.0.0.1 (ECONNREFUSED, e.g. in the Docker build)
+      host: '127.0.0.1',
+    },
     server: {
       proxy: {
         // string shorthand: http://localhost:5173/iapi -> http://localhost:9000/iapi
