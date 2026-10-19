@@ -37,9 +37,9 @@ export default [
     route("*", "components/NotFound.tsx", { id: "election-not-found" }),
   ]),
   route("legalese", "routes/Legalese.tsx"),
-  route("legalese/im", "components/Masthead.tsx"),
+  route("legalese/im", "components/Imprint.tsx"),
   route("legalese/pp", "components/PrivacyPolicy.tsx"),
-  route("legalese/tos", "components/ToDo.tsx"),
+  route("legalese/tos", "components/TermsOfService.tsx"),
   route("prices", "components/Prices.tsx"),
   route("*", "components/NotFound.tsx"),
 ] satisfies RouteConfig;

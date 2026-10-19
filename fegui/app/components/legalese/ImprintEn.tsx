@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright (c) 2021-2026 Squeng AG
+ * Copyright (c) 2026 Squeng AG
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,23 +24,33 @@
 
 import React from "react";
 
-function Masthead(props: {}) {
-  console.log("Masthead props: " + JSON.stringify(props));
-
+// cf. ImprintDe.tsx, which has to say the same
+function ImprintEn() {
   return (
     <React.Fragment>
-      <h1>Impressum</h1>
+      <h1>Imprint</h1>
+      <p>Twotle is a product of</p>
+      <address>
+        <strong>Squeng AG</strong>
+        <br />
+        Switzerland Innovation Park Ost
+        <br />
+        Lerchenfeldstrasse 3
+        <br />
+        9014 St.Gallen
+        <br />
+        Switzerland
+      </address>
       <p>
-        Twotle ist eine Anwendung der Squeng AG, auf{" "}
-        <a
-          href="https://www.squeng.com/impressum"
-          target="Squeng" rel="noreferrer noopener"
-        >
-          deren Impressum
-        </a> verwiesen wird.
+        E-mail: <a href="mailto:twotle@squeng.com">twotle@squeng.com</a>
+      </p>
+      <p>Commercial register: St.Gallen, UID CHE-383.211.903</p>
+      <p>VAT number: CHE-383.211.903 MWST</p>
+      <p>
+        Squeng<sup>&reg;</sup> is a registered trademark of Squeng AG.
       </p>
     </React.Fragment>
   );
 }
 
-export default Masthead;
+export default ImprintEn;

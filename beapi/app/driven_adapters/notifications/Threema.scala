@@ -57,7 +57,8 @@ class Threema @Inject() (implicit
 
   override def send(to: Phonenumber.PhoneNumber, text: String): Future[Unit] = {
 
-    logger.debug(s"trying to send to $to via Threema")
+    // not the recipient: the privacy policy lists what the log contains
+    logger.debug("trying to send a message via Threema")
 
     val data =
       s"from=${URLEncoder.encode(id, utf8)}&phone=${PhoneNumberUtil.getInstance().format(to, PhoneNumberUtil.PhoneNumberFormat.E164).substring(1)}&text=${URLEncoder

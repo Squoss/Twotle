@@ -88,7 +88,12 @@ function Abode(props: {}) {
                 aria-label="Close"
               ></button>
             </div>
-            <div className="modal-body">{localizations["legalese.cya"]}</div>
+            <div
+              className="modal-body"
+              dangerouslySetInnerHTML={{
+                __html: localizations["HTML.legalese.cya"],
+              }}
+            ></div>
             <div className="modal-footer">
               <button
                 type="button"

@@ -9,10 +9,10 @@ notFound.title = Not Found
 notFound.page = The page that you have requested has not been found.
 
 legalese = Legalese
-legalese.masthead = Imprint
+legalese.imprint = Imprint
 legalese.pp = Privacy Policy
 legalese.tos = Terms of Service
-legalese.cya = I have read the Privacy Policy as well as the Terms of Service and understand and accept them.
+HTML.legalese.cya = I have read the <a href="/legalese/pp" target="_blank" rel="noreferrer noopener">Privacy Policy</a> as well as the <a href="/legalese/tos" target="_blank" rel="noreferrer noopener">Terms of Service</a> and understand and accept them.
 
 acknowledgements = Acknowledgements
 prices = Prices

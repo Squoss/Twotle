@@ -9,10 +9,10 @@ notFound.title = Nicht Gefunden
 notFound.page = Die Seite, welche Sie angefordert haben, wurde nicht gefunden.
 
 legalese = Juristenjargon
-legalese.masthead = Impressum
-legalese.pp = Datenschutzrichtlinie
-legalese.tos = Allgemeine Geschäftsbedingungen
-legalese.cya = Ich habe die Datenschutzrichtlinie sowie die Allgemeinen Geschäftsbedingungen gelesen und verstehe und akzeptiere sie.
+legalese.imprint = Impressum
+legalese.pp = Datenschutzerklärung
+legalese.tos = Nutzungsbedingungen
+HTML.legalese.cya = Ich habe die <a href="/legalese/pp" target="_blank" rel="noreferrer noopener">Datenschutzerklärung</a> sowie die <a href="/legalese/tos" target="_blank" rel="noreferrer noopener">Nutzungsbedingungen</a> gelesen und verstehe und akzeptiere sie.
 
 acknowledgements = Danksagung
 prices = Preise

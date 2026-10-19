@@ -33,24 +33,12 @@ function Prices(props: {}) {
   return (
     <React.Fragment>
       <h1>{localizations["prices"]}</h1>
-      <div className="row align-items-center">
-        <div className="col">
-          <p
-            dangerouslySetInnerHTML={{
-              __html: localizations["HTML.teachingAid"],
-            }}
-          ></p>
-          <p>{localizations["readMe"]}</p>
-        </div>
-        <div className="col">
-          <iframe
-            title="Leanpub"
-            width="200"
-            height="400"
-            src="https://leanpub.com/DevWebApps/embed"
-          ></iframe>
-        </div>
-      </div>
+      <p
+        dangerouslySetInnerHTML={{
+          __html: localizations["HTML.teachingAid"],
+        }}
+      ></p>
+      <p>{localizations["readMe"]}</p>
     </React.Fragment>
   );
 }

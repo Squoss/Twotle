@@ -72,7 +72,8 @@ class Mailjet @Inject() (implicit
       plainText: String
   ): Future[Unit] = {
 
-    logger.debug(s"trying to send $subject to $to via Mailjet")
+    // neither the recipient nor the subject (the election's name): the privacy policy lists what the log contains
+    logger.debug("trying to send an e-mail via Mailjet")
 
     val data = Json.obj(
       "Messages" -> Json.arr(
@@ -113,7 +114,8 @@ class Mailjet @Inject() (implicit
 
   override def send(to: Phonenumber.PhoneNumber, text: String): Future[Unit] = {
 
-    logger.debug(s"trying to send to $to via Mailjet")
+    // not the recipient: the privacy policy lists what the log contains
+    logger.debug("trying to send a text message via Mailjet")
 
     val data = Json.obj(
       "From" -> "Twotle",

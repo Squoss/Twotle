@@ -22,6 +22,9 @@ Twotle is a web application inspired by doodle.com and meant as a teaching aid f
     - a `.dependency-cruiser.cjs` mirroring both `DependencyRulesTestSuite.scala` files (e.g., the hexagon depends on nothing outside itself; only `FetchRepository.ts` and `fetchLookups.ts` use `fetchJson.ts`; only `entry.client.tsx` depends on `FetchRepository.ts`)
     - an `npm run lint:arch` script and a matching step in `.github/workflows/test.yml`
   - **Until then:** nothing stops the hexagon from importing, e.g., React (npm hoists it); its tsconfig (no DOM lib, no types) only keeps browser APIs out.
+- **Delete elections automatically after a retention period.**
+  - **Why:** an election stays until it's deleted with its organizer link, so abandoned elections stay forever, whereas the Swiss Data Protection Act (Art. 6(4)) asks for deletion once data is no longer needed. For now, the privacy policy only says that Squeng AG may delete elections at any time.
+  - **Then:** pick a period (e.g., N months after an election's last event), add a purge to the persistence port, implement it in `MdbRepository` (a `deleteMany` on the last event's `occurred`), and schedule it (e.g., with Pekko's scheduler). Only once the purge runs, state the period in both privacy policies.
 
 ## Conventions
 
@@ -141,8 +144,9 @@ fegui/
 │   ├── root.tsx              # HTML document (Layout) and the localizations' clientLoader
 │   ├── routes.ts             # Route config (cf. beapi's conf/routes)
 │   ├── entry.client.tsx      # Browser entry and composition root (wires FetchRepository into Factory/AntiFactory for route modules via getContext, cf. context.ts); loads Bootstrap's JavaScript
-│   ├── App.tsx               # App shell (navbar, footer, cookie consent) around the routes' <Outlet />
+│   ├── App.tsx               # App shell (navbar, footer) around the routes' <Outlet />
 │   ├── components/, props/   # React GUI (driving adapters); most components double as route modules
+│   ├── components/legalese/  # Imprint, privacy policy, and terms of service, one component per locale (De/En)
 │   ├── routes/               # Thin route modules where routing needs glue (redirects, the election tabs and their clientAction)
 │   ├── FetchRepository.ts    # REST adapter for the Repository port (driven adapter)
 │   ├── fetchLookups.ts       # Localizations, time zones (cached), validations (bypass the hexagon, like beapi's I18nController/ValidationsController)
@@ -173,6 +177,11 @@ Import the hexagon via `@twotle/hexagon` (the `hexagon/src/index.ts` barrel), ne
 - **Mutations as `clientAction`s** rather than entity calls in components: components are views, and route modules are the driving adapters. A save costs a GET (recreating the entity), the mutation, and a GET (revalidation); the time zones are cached.
 - **CSP nonces:** Play's CSP allows React Router's inline scripts via per-request nonces. The alternatives were rejected: hashes change with every build, `'unsafe-inline'` weakens the CSP, and moving the scripts into files at build time would depend on React Router's output format.
 - **Query strings are built with `URLSearchParams`:** a raw `+` would arrive at Play as a space.
+- **The privacy policy describes what Twotle actually processes:**
+  - Hence there is no cookie banner: the site only sets cookies it needs (`PLAY_SESSION` for the CSRF token) or that store a choice (`PLAY_LANG`), and stores nothing else in the browser.
+  - The site makes no third-party requests (the CSP's origins are all `'self'`), and the notification adapters log no recipients.
+  - So a change to cookies, browser storage, third-party requests (the CSP's origins), log contents, stored data, or providers (e.g., `di.sms`, the MongoDB host) must update both locales of the privacy policy (`components/legalese/`), and the two locales must say the same.
+  - Facts only Squeng AG can supply go in as `{TODO: …}` placeholders. Since Clever Cloud deploys main, `grep -rn "{TODO" fegui/app/components/legalese` must come back empty before committing.
 
 #### Gotchas
 

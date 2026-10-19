@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright (c) 2021-2022 Squeng AG
+ * Copyright (c) 2026 Squeng AG
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,10 +22,16 @@
  * THE SOFTWARE.
  */
 
-function ToDo(props: {}) {
-  console.log("ToDo props: " + JSON.stringify(props));
+import { useLocalizations } from "../localizations";
+import TermsOfServiceDe from "./legalese/TermsOfServiceDe";
+import TermsOfServiceEn from "./legalese/TermsOfServiceEn";
 
-  return <mark>To Do</mark>;
+function TermsOfService(props: {}) {
+  console.log("TermsOfService props: " + JSON.stringify(props));
+
+  const localizations = useLocalizations();
+
+  return localizations["locale"] === "de" ? <TermsOfServiceDe /> : <TermsOfServiceEn />;
 }
 
-export default ToDo;
+export default TermsOfService;

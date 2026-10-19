@@ -50,8 +50,6 @@ export function Layout({ children }: Readonly<{ children: React.ReactNode }>) {
         <link rel="icon" href="/favicon.ico" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta name="description" content="Fix a date & time (with a tip of the hat to classic Doodle)" />
-        {/* async (rather than defer) so that React 19 treats it as a resource instead of warning about a script tag */}
-        <script src="https://app.rybbit.io/api/script.js" data-site-id="64b4c9e59152" async></script>
         {/* generated with https://realfavicongenerator.net/ */}
         <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />

@@ -43,18 +43,6 @@ function App(props: {}) {
     document.getElementById("rootElement")?.setAttribute("data-bs-theme", mode);
   }, [mode]);
 
-  useEffect(() => {
-    const cookieConsentFlag = globalThis.sessionStorage.getItem("cookieConsent");
-    if (cookieConsentFlag === null) {
-      // Bootstrap's JavaScript needs the DOM, so it must not be imported statically (cf. entry.client.tsx)
-      import("bootstrap").then(({ Modal }) => {
-        const modal = new Modal(document.getElementById("cookieConsentModal")!);
-        modal.show();
-      });
-      globalThis.sessionStorage.setItem("cookieConsent", "shown");
-    }
-  }, []);
-
   return (
     <React.Fragment>
       <a className="visually-hidden-focusable" href="#content">{localizations["skipToMainContent"]}</a>{/* https://getbootstrap.com/docs/5.3/getting-started/accessibility/#visually-hidden-content */}
@@ -116,7 +104,7 @@ function App(props: {}) {
                       className={({ isActive }) => (isActive ? "dropdown-item disabled" : "dropdown-item")}
                       to="/legalese/im"
                     >
-                      {localizations["legalese.masthead"]}
+                      {localizations["legalese.imprint"]}
                     </NavLink>
                   </li>
                   <li>
@@ -210,7 +198,7 @@ function App(props: {}) {
             <div className="row">
               <div className="col">
                 <Link className="link text-decoration-none" to="/legalese/im">
-                  {localizations["legalese.masthead"]}
+                  {localizations["legalese.imprint"]}
                 </Link>
               </div>
               <div className="col">
@@ -230,104 +218,6 @@ function App(props: {}) {
           </div>
         </nav>
       </footer>
-
-      <div
-        className="modal fade"
-        id="cookieConsentModal"
-        tabIndex={-1}
-        aria-labelledby="cookieConsentModalLabel"
-        aria-hidden="true"
-      >
-        <div className="modal-dialog modal-xl">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h5 className="modal-title" id="cookieConsentModalLabel">
-                <span className="text-center">Cookie Monster</span>
-              </h5>
-            </div>
-            <div className="modal-body">
-              <p>
-                Being a Web app, Twotle uses various{" "}
-                <a href="https://developer.mozilla.org/" target="MDN" rel="noreferrer noopener">
-                  Web technologies
-                </a>
-                , including but not limited to{" "}
-                <a
-                  href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies"
-                  target="MDN"
-                  rel="noreferrer noopener"
-                >
-                  cookies
-                </a>
-                .{" "}
-                <button
-                  className="btn btn-info btn-sm"
-                  type="button"
-                  data-bs-toggle="collapse"
-                  data-bs-target="#cookieConsentCollapse"
-                  aria-expanded="false"
-                  aria-controls="cookieConsentCollapse"
-                >
-                  <i className="bi bi-chevron-expand"></i> Learn more …
-                </button>
-              </p>
-              <div className="collapse" id="cookieConsentCollapse">
-                <div className="card card-body">
-                  <p>
-                    For the time being, Twotle uses two{" "}
-                    <a
-                      href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#define_the_lifetime_of_a_cookie"
-                      target="MDN"
-                      rel="noreferrer noopener"
-                    >
-                      session cookies
-                    </a>{" "}
-                    of its own (but neither permanent nor third-party cookies):
-                  </p>
-                  <ol>
-                    <li>
-                      The{" "}
-                      <a
-                        href="https://www.playframework.com/documentation/latest/SettingsSession"
-                        target="Play"
-                        rel="noreferrer noopener"
-                      >
-                        Play session cookie
-                      </a>
-                      , typically called <code>PLAY_SESSION</code>, to{" "}
-                      <a
-                        href="https://www.playframework.com/documentation/latest/ScalaCsrf#Adding-a-CSRF-token-to-the-session"
-                        target="Play"
-                        rel="noreferrer noopener"
-                      >
-                        add an anti-CSRF token
-                      </a>
-                      .
-                    </li>
-                    <li>
-                      The{" "}
-                      <a
-                        href="https://www.playframework.com/documentation/latest/ScalaI18N#Language-Cookie-Support"
-                        target="Play"
-                        rel="noreferrer noopener"
-                      >
-                        Play language cookie
-                      </a>
-                      , typically called <code>PLAY_LANG</code>, to remember your preferred language.
-                    </li>
-                  </ol>
-                </div>
-              </div>
-            </div>
-            <div className="modal-footer">
-              <button type="button" className="btn btn-primary" data-bs-dismiss="modal">
-                Take it
-              </button>{" "}
-              or <a href="https://noyb.eu/">leave it</a>
-            </div>
-          </div>
-        </div>
-      </div>
     </React.Fragment>
   );
 }
