@@ -44,7 +44,7 @@ export function Layout({ children }: Readonly<{ children: React.ReactNode }>) {
   const csrfToken = replacedByPlay("REPLACE_CSRF_TOKEN", (doc) => doc.querySelector('meta[name="csrf-token"]')?.getAttribute("content"));
 
   return (
-    <html lang={lang} data-bs-theme="light" id="rootElement">
+    <html lang={lang} id="rootElement">
       <head>
         <meta charSet="utf-8" />
         <link rel="icon" href="/favicon.ico" />
@@ -98,7 +98,7 @@ export function HydrateFallback() {
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   return (
     <main className="container" id="content">
-      <div className="alert alert-danger" role="alert">
+      <div className="alert theme-danger" role="alert">
         {isRouteErrorResponse(error) ? `${error.status} ${error.statusText}` : String(error)}
       </div>
     </main>

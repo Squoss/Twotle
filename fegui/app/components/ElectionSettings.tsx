@@ -83,7 +83,7 @@ function ElectionSettings(props: Readonly<ElectionSettingsProps>) {
 
   const handleDeleteElection = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    import("bootstrap").then(({ Modal }) => Modal.getInstance(document.getElementById("deleteElectionModal")!)!.hide());
+    import("bootstrap").then(({ Dialog }) => Dialog.getInstance(document.getElementById("deleteElectionDialog")!)!.hide());
     submit({ intent: "destroyElection" });
   };
 
@@ -97,7 +97,7 @@ function ElectionSettings(props: Readonly<ElectionSettingsProps>) {
 
   return (
     <React.Fragment>
-      <form className="d-grid gap-4">
+      <form className="d-grid gap-7">
         <div
           className={
             subscriptionChangesSaved() ? "card" : "card border-warning"
@@ -139,15 +139,15 @@ function ElectionSettings(props: Readonly<ElectionSettingsProps>) {
                 : "card-footer bg-warning"
             }
           >
-            <div className="d-grid gap-2 d-md-flex justify-content-md-end">
+            <div className="d-grid gap-3 md:d-flex md:justify-content-end">
               <button
-                className="btn btn-secondary"
+                className="btn-solid theme-secondary"
                 onClick={cancelSubscriptions}
               >
                 {localizations["revert"]}
               </button>
               <button
-                className="btn btn-primary"
+                className="btn-solid theme-primary"
                 onClick={saveSubscriptions}
                 disabled={
                   subscriptionChangesSaved() ||
@@ -161,7 +161,7 @@ function ElectionSettings(props: Readonly<ElectionSettingsProps>) {
           </div>
         </div>
       </form>
-      <form className="d-grid gap-4">
+      <form className="d-grid gap-7">
         <div
           className={visibilityChangesSaved() ? "card" : "card border-warning"}
         >
@@ -170,7 +170,7 @@ function ElectionSettings(props: Readonly<ElectionSettingsProps>) {
               {localizations["settings.visibility"]}
             </h5>
             <select
-              className="form-select"
+              className="form-control"
               id="visibilitySelect"
               value={visibility}
               onChange={(event) =>
@@ -199,12 +199,12 @@ function ElectionSettings(props: Readonly<ElectionSettingsProps>) {
                 : "card-footer bg-warning"
             }
           >
-            <div className="d-grid gap-2 d-md-flex justify-content-md-end">
-              <button className="btn btn-secondary" onClick={cancelVisibility}>
+            <div className="d-grid gap-3 md:d-flex md:justify-content-end">
+              <button className="btn-solid theme-secondary" onClick={cancelVisibility}>
                 {localizations["revert"]}
               </button>
               <button
-                className="btn btn-primary"
+                className="btn-solid theme-primary"
                 onClick={saveVisibility}
                 disabled={visibilityChangesSaved()}
               >
@@ -222,62 +222,56 @@ function ElectionSettings(props: Readonly<ElectionSettingsProps>) {
           {localizations["settings.trash.finality"]}
         </div>
         <div className="card-footer">
-          <div className="d-grid gap-2 d-md-flex justify-content-md-end">
+          <div className="d-grid gap-3 md:d-flex md:justify-content-end">
             <button
-              className="btn btn-danger"
-              data-bs-toggle="modal"
-              data-bs-target="#deleteElectionModal"
+              className="btn-solid theme-danger"
+              data-bs-toggle="dialog"
+              data-bs-target="#deleteElectionDialog"
             >
               {localizations["settings.trash"]}
             </button>
           </div>
         </div>
       </div>
-      <div
-        className="modal fade"
-        id="deleteElectionModal"
-        tabIndex={-1}
-        aria-labelledby="deleteElectionModalLabel"
-        aria-hidden="true"
+      <dialog
+        className="dialog"
+        id="deleteElectionDialog"
+        aria-labelledby="deleteElectionDialogLabel"
       >
-        <div className="modal-dialog">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h5 className="modal-title" id="deleteElectionModalLabel">
-                <i className="bi bi-shield-exclamation"></i>
-              </h5>
-              <button
-                type="button"
-                className="btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-              ></button>
-            </div>
-            <div className="modal-body">
-              {
-                localizations["settings.trash.pointOfNoReturn"].replace(
-                  "{0}",
-                  props.election.name
-                )
-              }
-            </div>
-            <div className="modal-footer">
-              <button
-                type="button"
-                className="btn btn-secondary"
-                data-bs-dismiss="modal"
-              >
-                {localizations["no"]}
-              </button>
-              <form onSubmit={handleDeleteElection}>
-                <button type="submit" className="btn btn-danger">
-                  {localizations["yes"]}
-                </button>
-              </form>
-            </div>
-          </div>
+        <div className="dialog-header">
+          <h5 className="dialog-title" id="deleteElectionDialogLabel">
+            <i className="bi bi-shield-exclamation"></i>
+          </h5>
+          <button
+            type="button"
+            className="btn-close"
+            data-bs-dismiss="dialog"
+            aria-label="Close"
+          ></button>
         </div>
-      </div>
+        <div className="dialog-body">
+          {
+            localizations["settings.trash.pointOfNoReturn"].replace(
+              "{0}",
+              props.election.name
+            )
+          }
+        </div>
+        <div className="dialog-footer">
+          <button
+            type="button"
+            className="btn-solid theme-secondary"
+            data-bs-dismiss="dialog"
+          >
+            {localizations["no"]}
+          </button>
+          <form onSubmit={handleDeleteElection}>
+            <button type="submit" className="btn-solid theme-danger">
+              {localizations["yes"]}
+            </button>
+          </form>
+        </div>
+      </dialog>
     </React.Fragment>
   );
 }

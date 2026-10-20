@@ -44,20 +44,20 @@ function Abode(props: {}) {
 
   const localizations = useLocalizations();
 
-  const hidePostElectionModal = () => {
-    import("bootstrap").then(({ Modal }) => Modal.getInstance(document.getElementById("postElectionModal")!)!.hide());
+  const hidePostElectionDialog = () => {
+    import("bootstrap").then(({ Dialog }) => Dialog.getInstance(document.getElementById("postElectionDialog")!)!.hide());
   };
 
   return (
     <React.Fragment>
-      <div className="border-primary p-5 border rounded">
+      <div className="border-primary p-12 border rounded">
         <h1 title="Fix a date & time">Twotle</h1>
-        <p className="lead">{localizations["executiveSummary"]}</p>
+        <p className="fs-lg fw-light">{localizations["executiveSummary"]}</p>
         <button
           type="button"
-          className="btn btn-lg btn-primary"
-          data-bs-toggle="modal"
-          data-bs-target="#postElectionModal"
+          className="btn-solid btn-lg theme-primary"
+          data-bs-toggle="dialog"
+          data-bs-target="#postElectionDialog"
         >
           {localizations["createRepliesPage"]} &raquo;
         </button>
@@ -68,49 +68,43 @@ function Abode(props: {}) {
         ></p>
       </div>
 
-      <div
-        className="modal fade"
-        id="postElectionModal"
-        tabIndex={-1}
-        aria-labelledby="postElectionModalLabel"
-        aria-hidden="true"
+      <dialog
+        className="dialog"
+        id="postElectionDialog"
+        aria-labelledby="postElectionDialogLabel"
       >
-        <div className="modal-dialog">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h5 className="modal-title" id="postElectionModalLabel">
-                <i className="bi bi-shield-exclamation"></i>
-              </h5>
-              <button
-                type="button"
-                className="btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-              ></button>
-            </div>
-            <div
-              className="modal-body"
-              dangerouslySetInnerHTML={{
-                __html: localizations["HTML.legalese.cya"],
-              }}
-            ></div>
-            <div className="modal-footer">
-              <button
-                type="button"
-                className="btn btn-secondary"
-                data-bs-dismiss="modal"
-              >
-                {localizations["no"]}
-              </button>
-              <Form method="post" onSubmit={hidePostElectionModal}>
-                <button type="submit" className="btn btn-primary">
-                  {localizations["yes"]}
-                </button>
-              </Form>
-            </div>
-          </div>
+        <div className="dialog-header">
+          <h5 className="dialog-title" id="postElectionDialogLabel">
+            <i className="bi bi-shield-exclamation"></i>
+          </h5>
+          <button
+            type="button"
+            className="btn-close"
+            data-bs-dismiss="dialog"
+            aria-label="Close"
+          ></button>
         </div>
-      </div>
+        <div
+          className="dialog-body"
+          dangerouslySetInnerHTML={{
+            __html: localizations["HTML.legalese.cya"],
+          }}
+        ></div>
+        <div className="dialog-footer">
+          <button
+            type="button"
+            className="btn-solid theme-secondary"
+            data-bs-dismiss="dialog"
+          >
+            {localizations["no"]}
+          </button>
+          <Form method="post" onSubmit={hidePostElectionDialog}>
+            <button type="submit" className="btn-solid theme-primary">
+              {localizations["yes"]}
+            </button>
+          </Form>
+        </div>
+      </dialog>
     </React.Fragment>
   );
 }

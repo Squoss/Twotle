@@ -90,7 +90,7 @@ function ElectionTabs(props: Readonly<ElectionTabsProps>) {
   }
 
   const brandNewAlert = (
-    <div className="alert alert-success" role="alert">
+    <div className="alert theme-success" role="alert">
       <h4 className="alert-heading">{localizations["electionPageCreated"]}</h4>
       <p>{localizations["firstThingsFirst"]}</p>
       <hr />

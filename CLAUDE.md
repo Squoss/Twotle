@@ -192,6 +192,7 @@ Import the hexagon via `@twotle/hexagon` (the `hexagon/src/index.ts` barrel), ne
 - **Build-time pre-rendering in Node:** route modules are also evaluated in Node. So they must not import Bootstrap's JavaScript statically, as it touches `document`: `entry.client.tsx` loads it, and components use `import("bootstrap")` in effects and handlers.
 - **Values that Play injects into `index.html`** (`lang`, CSRF token) must be rendered from `document` in the browser (`replacedByPlay` in `root.tsx`). Otherwise React 19 adds a second `<meta>` while hydrating.
 - **Pre-rendering in Docker:** `react-router build` pre-renders via a Vite preview server. In `node:24` containers, `localhost` resolves to `::1`, whereas the pre-render requests `127.0.0.1`; hence `preview.host: '127.0.0.1'` in `vite.config.ts`. CI's Test workflow doesn't run `npm run build`, so verify build-related changes with `docker build --target react .`.
+- **Bootstrap 6 and `build.cssTarget`:** below Bootstrap's browser floors (`node_modules/bootstrap/.browserslistrc`), Lightning CSS lowers `light-dark()` to a polyfill that resolves the color tokens on `:root`, so nested `data-bs-theme` attributes (the navbar's, `Clipboard`'s) silently stop working. The dev server doesn't minify CSS, so only a build shows it. Keep `cssTarget` in `vite.config.ts` at those floors when upgrading Bootstrap.
 - **npm:** `react-router typegen` installs `isbot` on its own if it's missing. Don't run the dev server while packages might get installed; on Windows, file locks once gutted `node_modules`.
 - **Props logging:** route components that log `JSON.stringify(props)` receive React Router's route props (`loaderData`, `matches`, …). Watch out for circular values (e.g., React elements created during render).
 - **Vite's first load:** a freshly started dev server may answer the first page load with "504 Outdated Optimize Dep" while Vite re-bundles dependencies; reload.
@@ -229,7 +230,7 @@ Required for full functionality:
 - `beapi/app/controllers/gui/ReactController.scala` - Serves fegui's pre-rendered index.html (placeholders, CSP nonces) and assets
 - `beapi/test/DependencyRulesTestSuite.scala` - ArchUnit architecture tests (app)
 - `beapi/hexagon/src/test/scala/DependencyRulesTestSuite.scala` - ArchUnit architecture tests (hexagon)
-- `fegui/vite.config.ts` - Vite config (React Router plugin, /iapi proxy, /fegui/ base for builds, preview host for pre-rendering)
+- `fegui/vite.config.ts` - Vite config (React Router plugin, /iapi proxy, /fegui/ base for builds, preview host for pre-rendering, CSS target for Bootstrap 6)
 - `fegui/react-router.config.ts` - React Router framework mode config (SPA)
 - `fegui/app/routes.ts` - Frontend route config
 - `fegui/app/entry.client.tsx` - Frontend composition root
@@ -247,4 +248,4 @@ fegui has no test suite yet:
   - cast and revoke a vote, and send a reminder
   - open the voters' link, and switch tokens via the URL's fragment
   - a bad token shows Forbidden, and a deleted election shows Not Found
-  - the `/legalese` redirect, the locale switch, dark mode, and deep-link reloads
+  - the `/legalese` redirect, the locale switch, the color modes (light, dark, and auto), and deep-link reloads

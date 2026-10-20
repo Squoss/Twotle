@@ -22,18 +22,11 @@
  * THE SOFTWARE.
  */
 
-import React, { useState } from "react";
-import { DayPicker } from "@daypicker/react";
-import { de, enUS } from "@daypicker/react/locale";
-import "@daypicker/react/style.css";
+import React, { useEffect, useRef, useState } from "react";
+import type { Datepicker } from "bootstrap";
 import { useLocalizations } from "../localizations";
 import { useElectionSubmit } from "../useElectionSubmit";
 import { ElectionCandidatesProps } from "../props/ElectionCandidatesProps";
-
-// Use local date parts to avoid UTC/local timezone offset issues
-function localDateStr(d: Date): string {
-  return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
-}
 
 // Parse "YYYY-MM-DDTHH:mm:ss" candidates into { "YYYY-MM-DD": ["HH:mm", ...] }
 function parseCandidates(candidates: string[]): Record<string, string[]> {
@@ -74,25 +67,51 @@ function ttu(s?: string) {
 function ElectionCandidates(props: Readonly<ElectionCandidatesProps>) {
   const localizations = useLocalizations();
   const submit = useElectionSubmit();
-  const locale = localizations["locale"] === "de" ? de : enUS;
+  const locale = localizations["locale"];
 
   const [schedule, setSchedule] = useState<Record<string, string[]>>(parseCandidates(props.election.candidates));
   const [timeZone, setTimeZone] = useState(props.election.timeZone ?? Intl.DateTimeFormat().resolvedOptions().timeZone);
 
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  // Bootstrap's Datepicker renders the calendar into this element; its selected dates ("YYYY-MM-DD") are the schedule's keys
+  const calendarRef = useRef<HTMLDivElement>(null);
+  const datepickerRef = useRef<Datepicker | null>(null);
 
-  // Noon local time avoids any UTC rollover when DayPicker compares dates
-  const selectedDays = Object.keys(schedule).map((ds) => new Date(ds + "T12:00:00"));
+  useEffect(() => {
+    const element = calendarRef.current!;
+    let disposed = false;
+    const handleSelect = (event: Event) => {
+      const { dates } = event as Event & { dates: string[] };
+      setSchedule((schedule) => Object.fromEntries(dates.map((date) => [date, schedule[date] ?? [""]]))); // preserve existing times
+    };
+    element.addEventListener("change.bs.datepicker", handleSelect);
+    // imported dynamically because route modules are also pre-rendered in Node (cf. entry.client.tsx)
+    import("bootstrap").then(({ Datepicker }) => {
+      if (!disposed) {
+        datepickerRef.current = new Datepicker(element, {
+          inline: true,
+          selectionMode: "multiple",
+          dateMin: "today",
+          locale,
+          selectedDates: Object.keys(schedule),
+        });
+      }
+    });
+    return () => {
+      disposed = true;
+      element.removeEventListener("change.bs.datepicker", handleSelect);
+      datepickerRef.current?.dispose();
+      datepickerRef.current = null;
+    };
+  }, [locale]);
 
-  const handleSelect = (days: Date[] | undefined) => {
-    const newSchedule: Record<string, string[]> = {};
-    for (const day of days ?? []) {
-      const ds = localDateStr(day);
-      newSchedule[ds] = schedule[ds] ?? [""]; // preserve existing times
+  // the calendar follows changes it didn't make (e.g., reverting, or removing a date's last time)
+  useEffect(() => {
+    const dates = Object.keys(schedule).sort((a, b) => a.localeCompare(b));
+    const datepicker = datepickerRef.current;
+    if (datepicker && datepicker.getSelectedDates().sort((a, b) => a.localeCompare(b)).join() !== dates.join()) {
+      datepicker.setSelectedDates(dates);
     }
-    setSchedule(newSchedule);
-  };
+  }, [schedule]);
 
   const updateTime = (date: string, index: number, time: string) => {
     const times = [...schedule[date]];
@@ -141,18 +160,18 @@ function ElectionCandidates(props: Readonly<ElectionCandidatesProps>) {
   ));
 
   return (
-    <form className="d-grid gap-4">
+    <form className="d-grid gap-7">
       <div className={changesSaved() ? "card" : "card border-warning"}>
         <div className="card-body">
           <h5 className="card-title">{localizations["datesAndTimes.instruction"]}</h5>
 
           {/* Timezone */}
-          <div className="mb-3">
+          <div className="mb-5">
             <label htmlFor="timeZoneSelect" className="form-label">
               {localizations["datesAndTimes.timeZone"]}
             </label>
             <select
-              className="form-select"
+              className="form-control"
               id="timeZoneSelect"
               value={timeZone}
               onChange={(e) => setTimeZone(e.target.value)}
@@ -167,24 +186,16 @@ function ElectionCandidates(props: Readonly<ElectionCandidatesProps>) {
           {/* Calendar + per-date times */}
           <div className="row align-items-start">
             <div className="col-auto">
-              <div className="border rounded p-1">
-                <DayPicker
-                  mode="multiple"
-                  selected={selectedDays}
-                  onSelect={handleSelect}
-                  disabled={{ before: today }}
-                  locale={locale}
-                />
-              </div>
+              <div ref={calendarRef}></div>
             </div>
             <div className="col">
               {Object.keys(schedule).length === 0 ? (
-                <p className="text-muted fst-italic">{localizations["datesAndTimes"]}</p>
+                <p className="fg-secondary fst-italic">{localizations["datesAndTimes"]}</p>
               ) : (
                 Object.keys(schedule)
                   .sort((a, b) => a.localeCompare(b))
                   .map((date) => (
-                    <div key={date} className="mb-3">
+                    <div key={date} className="mb-5">
                       <div className="fw-semibold mb-1">
                         {new Date(date + "T12:00:00").toLocaleDateString(localizations["locale"], {
                           weekday: "short",
@@ -203,7 +214,7 @@ function ElectionCandidates(props: Readonly<ElectionCandidatesProps>) {
                           />
                           <button
                             type="button"
-                            className="btn btn-danger"
+                            className="btn-solid theme-danger"
                             onClick={() => removeTime(date, i)}
                             title="Remove this time"
                           >
@@ -218,12 +229,12 @@ function ElectionCandidates(props: Readonly<ElectionCandidatesProps>) {
           </div>
         </div>
         <div className={changesSaved() ? "card-footer" : "card-footer bg-warning"}>
-          <div className="d-grid gap-2 d-md-flex justify-content-md-end">
-            <button className="btn btn-secondary" onClick={cancelSchedule}>
+          <div className="d-grid gap-3 md:d-flex md:justify-content-end">
+            <button className="btn-solid theme-secondary" onClick={cancelSchedule}>
               {localizations["revert"]}
             </button>
             <button
-              className="btn btn-primary"
+              className="btn-solid theme-primary"
               onClick={saveSchedule}
               disabled={candidates.length === 0 || hasEmptyTimes || changesSaved()}
             >

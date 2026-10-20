@@ -16,6 +16,10 @@ HTML.legalese.cya = I have read the <a href="/legalese/pp" target="_blank" rel="
 
 acknowledgements = Acknowledgements
 prices = Prices
+colorMode = Color mode
+colorMode.light = Light
+colorMode.dark = Dark
+colorMode.auto = Auto
 
 yes = Yes
 no = No

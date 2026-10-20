@@ -8,6 +8,9 @@ export default defineConfig(({ command }) => {
     base: command === 'build' ? '/fegui/' : '/',
     build: {
       assetsDir: 'vrassets',
+      // Bootstrap 6's browser floors (cf. its .browserslistrc): below them, Lightning CSS lowers light-dark() to a polyfill
+      // that resolves the color tokens on :root, so nested data-bs-theme attributes (e.g., the navbar's) would have no effect
+      cssTarget: ['chrome130', 'edge130', 'firefox132', 'safari18', 'ios18'],
     },
     plugins: [reactRouter()],
     preview: {

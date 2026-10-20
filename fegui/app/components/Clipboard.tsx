@@ -42,10 +42,12 @@ function Clipboard(props: Readonly<ClipboardProps>) {
         setCopied(false);
       });
 
+  // theme-inverse is dark in the light color mode, which the button keeps on the links' colored cards in dark mode, too
   return (
     <button
       type="button"
-      className="btn btn-outline-dark"
+      className="btn-outline theme-inverse"
+      data-bs-theme="light"
       onClick={writeToClipboard}
     >
       {copied ? (

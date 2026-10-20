@@ -74,60 +74,51 @@ function ElectionVote(props: ElectionVoteProps) {
           onChange={(event) => setName(event.target.value)}
         />
       </td>
-      {candidates.map((candidate, i) => (
+      {candidates.map((candidate) => (
         <td key={Date.parse(candidate)}>
-          <div className="form-check row row-cols-1">
+          <div className="row row-cols-1">
             <div className="col">
-              <input
-                className="btn-check"
-                type="radio"
-                name={candidate}
-                value={Availability.NO}
-                id={"notAvailable" + i}
-                checked={availability.get(candidate) === Availability.NO}
-                onChange={updateAvailability}
-              />
               <label
                 title={localizations["no"]}
-                className="btn btn-outline-danger"
-                htmlFor={"notAvailable" + i}
+                className="btn-check btn-outline theme-danger"
               >
+                <input
+                  type="radio"
+                  name={candidate}
+                  value={Availability.NO}
+                  checked={availability.get(candidate) === Availability.NO}
+                  onChange={updateAvailability}
+                />
                 <span title={localizations["no"]}>🙁</span>
               </label>
             </div>
             <div className="col">
-              <input
-                className="btn-check"
-                type="radio"
-                name={candidate}
-                value={Availability.IFNEEDBE}
-                id={"ifneedbeAvailable" + i}
-                checked={availability.get(candidate) === Availability.IFNEEDBE}
-                onChange={updateAvailability}
-              />
               <label
                 title={localizations["ifNeedBe"]}
-                className="btn btn-outline-warning"
-                htmlFor={"ifneedbeAvailable" + i}
+                className="btn-check btn-outline theme-warning"
               >
+                <input
+                  type="radio"
+                  name={candidate}
+                  value={Availability.IFNEEDBE}
+                  checked={availability.get(candidate) === Availability.IFNEEDBE}
+                  onChange={updateAvailability}
+                />
                 <span title={localizations["ifNeedBe"]}>😐</span>
               </label>
             </div>
             <div className="col">
-              <input
-                className="btn-check"
-                type="radio"
-                name={candidate}
-                value={Availability.YES}
-                id={"yesAvailable" + i}
-                checked={availability.get(candidate) === Availability.YES}
-                onChange={updateAvailability}
-              />
               <label
                 title={localizations["yes"]}
-                className="btn btn-outline-success"
-                htmlFor={"yesAvailable" + i}
+                className="btn-check btn-outline theme-success"
               >
+                <input
+                  type="radio"
+                  name={candidate}
+                  value={Availability.YES}
+                  checked={availability.get(candidate) === Availability.YES}
+                  onChange={updateAvailability}
+                />
                 <span title={localizations["yes"]}>🙂</span>
               </label>
             </div>
@@ -136,7 +127,7 @@ function ElectionVote(props: ElectionVoteProps) {
       ))}
       <td>
         <button
-          className="btn btn-primary"
+          className="btn-solid theme-primary"
           onClick={saveVote}
           disabled={name === ""}
         >
