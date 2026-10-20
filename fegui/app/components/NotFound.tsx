@@ -31,7 +31,7 @@ function NotFound(props: {}) {
   const localizations = useLocalizations();
 
   return (
-    <div className="alert alert-info" role="alert">
+    <div className="alert theme-info" role="alert">
       <h4 className="alert-heading">{localizations["notFound.title"]}</h4>
       <p>{localizations["notFound.page"]}</p>
       <hr />

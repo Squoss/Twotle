@@ -26,6 +26,14 @@ import React, { useEffect, useState } from "react";
 import { Link, NavLink, Outlet, useLocation } from "react-router";
 import { useLocalizations } from "./localizations";
 
+type ColorMode = "light" | "dark" | "auto";
+
+const COLOR_MODE_ICONS: Record<ColorMode, string> = {
+  light: "bi-sun-fill",
+  dark: "bi-moon-stars-fill",
+  auto: "bi-circle-half",
+};
+
 function App(props: {}) {
   console.log("App props: " + JSON.stringify(props));
 
@@ -38,15 +46,28 @@ function App(props: {}) {
   locationString += "locale=NEWLOCALE";
   locationString += location.hash;
 
-  const [mode, setMode] = useState<"light" | "dark">("light");
+  // "auto" follows the operating system. Until the JavaScript runs, so does Bootstrap's :root (color-scheme: light dark),
+  // but a few rules (e.g., select's caret) need data-bs-theme="dark"; hence "auto" is resolved like in Bootstrap's color mode toggler.
+  // The choice isn't stored (the privacy policy says that the site stores nothing else in the browser), so a reload resets it.
+  const [mode, setMode] = useState<ColorMode>("auto");
   useEffect(() => {
-    document.getElementById("rootElement")?.setAttribute("data-bs-theme", mode);
+    const root = document.getElementById("rootElement")!;
+    if (mode !== "auto") {
+      root.setAttribute("data-bs-theme", mode);
+      return;
+    }
+    const darkQuery = globalThis.matchMedia("(prefers-color-scheme: dark)");
+    const resolve = () => root.setAttribute("data-bs-theme", darkQuery.matches ? "dark" : "light");
+    resolve();
+    darkQuery.addEventListener("change", resolve);
+    return () => darkQuery.removeEventListener("change", resolve);
   }, [mode]);
 
   return (
     <React.Fragment>
-      <a className="visually-hidden-focusable" href="#content">{localizations["skipToMainContent"]}</a>{/* https://getbootstrap.com/docs/5.3/getting-started/accessibility/#visually-hidden-content */}
-      <header className="navbar navbar-expand-md navbar-dark fixed-top bg-primary">
+      <a className="visually-hidden-focusable" href="#content">{localizations["skipToMainContent"]}</a>{/* https://getbootstrap.com/docs/6.0/getting-started/accessibility/#visually-hidden-content */}
+      {/* the dark color mode lightens the navbar's text and theme-inverse (e.g., the buttons) on bg-primary */}
+      <header className="navbar md:navbar-expand fixed-top bg-primary" data-bs-theme="dark">
         <nav className="container-fluid" aria-label="Main navigation">
           <Link className="navbar-brand" to="/">
             Twotle
@@ -57,134 +78,141 @@ function App(props: {}) {
             </small>
           </a>
           <button
-            className="navbar-toggler"
+            className="btn-icon navbar-toggler"
             type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#navbarCollapse"
-            aria-controls="navbarCollapse"
+            data-bs-toggle="drawer"
+            data-bs-target="#navbarDrawer"
+            aria-controls="navbarDrawer"
             aria-expanded="false"
             aria-label="Toggle navigation"
           >
             <span className="navbar-toggler-icon"></span>
           </button>
-          <div className="collapse navbar-collapse" id="navbarCollapse">
-            <ul className="navbar-nav me-auto mb-2 mb-md-0">
-              <li className="nav-item">
-                <NavLink
-                  className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")}
-                  aria-current="page"
-                  to="/"
-                >
-                  <i className="bi bi-house"></i>
-                </NavLink>
-              </li>
-              <li className="nav-item">
-                <NavLink
-                  className={({ isActive }) => (isActive ? "disabled nav-link active" : "disabled nav-link")}
-                  tabIndex={-1}
-                  aria-disabled="true"
-                  to="/acknowledgements"
-                >
-                  {localizations["acknowledgements"]}
-                </NavLink>
-              </li>
-              <li className="nav-item dropdown">
-                <button
-                  className="nav-link dropdown-toggle"
-                  type="button"
-                  id="legalese"
-                  data-bs-toggle="dropdown"
-                  aria-expanded="false"
-                >
-                  {localizations["legalese"]}
-                </button>
-                <ul className="dropdown-menu" aria-labelledby="legalese">
-                  <li>
+          {/* below md, a drawer; from md up, md:navbar-expand shows its body inline */}
+          <dialog className="drawer drawer-end" tabIndex={-1} id="navbarDrawer" aria-labelledby="navbarDrawerLabel">
+            <div className="drawer-header">
+              <h5 className="drawer-title" id="navbarDrawerLabel">
+                Twotle
+              </h5>
+              <button type="button" className="btn-close" data-bs-dismiss="drawer" aria-label="Close"></button>
+            </div>
+            <div className="drawer-body">
+              <ul className="nav navbar-nav me-auto mb-3 md:mb-0">
+                <li className="nav-item">
+                  <NavLink
+                    className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")}
+                    aria-current="page"
+                    to="/"
+                  >
+                    <i className="bi bi-house"></i>
+                  </NavLink>
+                </li>
+                <li className="nav-item">
+                  <NavLink
+                    className={({ isActive }) => (isActive ? "disabled nav-link active" : "disabled nav-link")}
+                    tabIndex={-1}
+                    aria-disabled="true"
+                    to="/acknowledgements"
+                  >
+                    {localizations["acknowledgements"]}
+                  </NavLink>
+                </li>
+                <li className="nav-item">
+                  <button className="nav-link" type="button" id="legalese" data-bs-toggle="menu" aria-expanded="false">
+                    {localizations["legalese"]}
+                  </button>
+                  <div className="menu" aria-labelledby="legalese">
                     <NavLink
-                      className={({ isActive }) => (isActive ? "dropdown-item disabled" : "dropdown-item")}
+                      className={({ isActive }) => (isActive ? "menu-item disabled" : "menu-item")}
                       to="/legalese/im"
                     >
                       {localizations["legalese.imprint"]}
                     </NavLink>
-                  </li>
-                  <li>
                     <NavLink
-                      className={({ isActive }) => (isActive ? "dropdown-item disabled" : "dropdown-item")}
+                      className={({ isActive }) => (isActive ? "menu-item disabled" : "menu-item")}
                       to="/legalese/pp"
                     >
                       {localizations["legalese.pp"]}
                     </NavLink>
-                  </li>
-                  <li>
                     <NavLink
-                      className={({ isActive }) => (isActive ? "dropdown-item disabled" : "dropdown-item")}
+                      className={({ isActive }) => (isActive ? "menu-item disabled" : "menu-item")}
                       to="/legalese/tos"
                     >
                       {localizations["legalese.tos"]}
                     </NavLink>
-                  </li>
-                </ul>
-              </li>
-              <li className="nav-item">
-                <NavLink className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")} to="/prices">
-                  {localizations["prices"]}
-                </NavLink>
-              </li>
-            </ul>
-            <div className="dropdown">
-              <button
-                className="btn btn-light dropdown-toggle"
-                type="button"
-                id="language"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
-                <i className="bi bi-globe"></i>
-              </button>
-              <ul className="dropdown-menu" aria-labelledby="language">
-                <li>
-                  <a
-                    className={localizations["locale"] === "de" ? "dropdown-item disabled" : "dropdown-item"}
-                    href={locationString.replace("NEWLOCALE", "de")}
-                  >
-                    Deutsch
-                  </a>
+                  </div>
                 </li>
-                <li>
-                  <a
-                    className={localizations["locale"] === "en" ? "dropdown-item disabled" : "dropdown-item"}
-                    href={locationString.replace("NEWLOCALE", "en")}
-                  >
-                    English
-                  </a>
+                <li className="nav-item">
+                  <NavLink className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")} to="/prices">
+                    {localizations["prices"]}
+                  </NavLink>
                 </li>
               </ul>
+              {/* one row, also in the drawer, whose body stacks (and stretches) its children */}
+              <div className="d-flex align-items-center gap-5">
+                <div>
+                  <button
+                    className="btn-solid theme-inverse"
+                    type="button"
+                    id="language"
+                    data-bs-toggle="menu"
+                    aria-expanded="false"
+                  >
+                    <i className="bi bi-globe"></i>
+                  </button>
+                  <div className="menu" aria-labelledby="language">
+                    <a
+                      className={localizations["locale"] === "de" ? "menu-item disabled" : "menu-item"}
+                      href={locationString.replace("NEWLOCALE", "de")}
+                    >
+                      Deutsch
+                    </a>
+                    <a
+                      className={localizations["locale"] === "en" ? "menu-item disabled" : "menu-item"}
+                      href={locationString.replace("NEWLOCALE", "en")}
+                    >
+                      English
+                    </a>
+                  </div>
+                </div>
+                <div>
+                  <button
+                    className="btn-solid theme-inverse"
+                    type="button"
+                    id="colorMode"
+                    data-bs-toggle="menu"
+                    aria-expanded="false"
+                    aria-label={localizations["colorMode"]}
+                  >
+                    <i className={`bi ${COLOR_MODE_ICONS[mode]}`}></i>
+                  </button>
+                  <div className="menu" aria-labelledby="colorMode">
+                    {(Object.keys(COLOR_MODE_ICONS) as ColorMode[]).map((m) => (
+                      <button
+                        key={m}
+                        type="button"
+                        className={m === mode ? "menu-item selected" : "menu-item"}
+                        aria-current={m === mode ? "true" : undefined}
+                        onClick={() => setMode(m)}
+                      >
+                        <i className={`bi ${COLOR_MODE_ICONS[m]} menu-item-icon`}></i>
+                        {localizations[`colorMode.${m}`]}
+                        <i className="bi bi-check2 menu-item-check"></i>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <a
+                  className="btn-outline theme-inverse"
+                  href="https://github.com/Squoss/Twotle"
+                  target="GitHub"
+                  rel="noreferrer noopener"
+                >
+                  <i className="bi bi-github"></i>
+                </a>
+              </div>
             </div>
-            &nbsp; &nbsp;
-            <div className="form-check form-switch text-bg-primary">
-              <input
-                className="form-check-input"
-                type="checkbox"
-                role="switch"
-                id="modeLightDark"
-                checked={mode === "dark"}
-                aria-checked={mode === "dark"}
-                onChange={() => (mode === "light" ? setMode("dark") : setMode("light"))}
-              />
-              <label className="form-check-label" htmlFor="modeLightDark">
-                <i className="bi bi-emoji-sunglasses-fill"></i> / <i className="bi bi-emoji-sunglasses"></i>
-              </label>
-            </div>
-            &nbsp; &nbsp;
-            <a
-              className="btn btn-outline-light"
-              href="https://github.com/Squoss/Twotle"
-              target="GitHub"
-              rel="noreferrer noopener"
-            >
-              <i className="bi bi-github"></i>
-            </a>
-          </div>
+          </dialog>
         </nav>
       </header>
 
@@ -192,7 +220,7 @@ function App(props: {}) {
         <Outlet />
       </main>
 
-      <footer className="d-none d-sm-block fixed-bottom">
+      <footer className="d-none sm:d-block fixed-bottom">
         <nav className="card text-center" aria-label="Legal links">
           <div className="card-body">
             <div className="row">

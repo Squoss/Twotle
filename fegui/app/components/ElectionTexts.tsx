@@ -64,7 +64,7 @@ function ElectionTexts(props: Readonly<ElectionTextsProps>) {
     tte(props.election.description) === description;
 
   return (
-    <form className="d-grid gap-4">
+    <form className="d-grid gap-7">
       <div className={changesSaved() ? "card" : "card border-warning"}>
         <div className="card-body">
           <h5 className="card-title">{localizations["texts.instruction"]}</h5>
@@ -97,12 +97,12 @@ function ElectionTexts(props: Readonly<ElectionTextsProps>) {
         <div
           className={changesSaved() ? "card-footer" : "card-footer bg-warning"}
         >
-          <div className="d-grid gap-2 d-md-flex justify-content-md-end">
-            <button className="btn btn-secondary" onClick={cancelText}>
+          <div className="d-grid gap-3 md:d-flex md:justify-content-end">
+            <button className="btn-solid theme-secondary" onClick={cancelText}>
               {localizations["revert"]}
             </button>
             <button
-              className="btn btn-primary"
+              className="btn-solid theme-primary"
               onClick={saveText}
               disabled={name === "" || changesSaved()}
             >

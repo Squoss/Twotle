@@ -22,7 +22,7 @@
  * THE SOFTWARE.
  */
 
-// Bootstrap's JavaScript (the data API for dropdowns, collapses, and modals) needs the DOM,
+// Bootstrap's JavaScript (the data API for menus, drawers, and dialogs) needs the DOM,
 // so it's loaded here, in the browser, rather than in route modules, which are also pre-rendered at build time
 import "bootstrap";
 import { AntiFactory, Factory } from "@twotle/hexagon";

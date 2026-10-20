@@ -64,7 +64,7 @@ function ElectionLinks(props: Readonly<ElectionLinksProps>) {
 
   return (
     <React.Fragment>
-      <div className="card text-dark bg-warning mb-3">
+      <div className="card theme-warning theme-contrast mb-5">
         <div className="card-header">{localizations["links.voters"]}</div>
         <div className="card-body">
           <div className="row align-items-center">
@@ -77,8 +77,8 @@ function ElectionLinks(props: Readonly<ElectionLinksProps>) {
           </div>
           {nrOfCandidates < 1 ? (
             <p className="card-text">
+              {/* inherits theme-contrast's foreground */}
               <NavLink
-                className="link-dark"
                 to={`/elections/${id}/dats#${organizerToken}`}
               >
                 {localizations["firstThingsFirst"]}
@@ -89,7 +89,7 @@ function ElectionLinks(props: Readonly<ElectionLinksProps>) {
           )}
         </div>
       </div>
-      <div className="card text-white bg-danger mb-3">
+      <div className="card theme-danger theme-contrast mb-5">
         <div className="card-header">
           <i className="bi bi-shield-fill-exclamation"></i>{" "}
           {localizations["links.organizers"]}
@@ -126,7 +126,7 @@ function ElectionLinks(props: Readonly<ElectionLinksProps>) {
                 </div>
                 <div className="col-auto">
                   <button
-                    className="btn btn-light"
+                    className="btn-solid theme-secondary"
                     onClick={sendLinksReminderEmail}
                     disabled={emailAddress === "" || !emailAddressValid}
                   >
@@ -153,7 +153,7 @@ function ElectionLinks(props: Readonly<ElectionLinksProps>) {
                 </div>
                 <div className="col-auto">
                   <button
-                    className="btn btn-light"
+                    className="btn-solid theme-secondary"
                     onClick={sendLinksReminderSms}
                     disabled={cellPhoneNumber === "" || !cellPhoneNumberValid}
                   >

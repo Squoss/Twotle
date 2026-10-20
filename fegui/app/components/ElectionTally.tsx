@@ -22,12 +22,19 @@
  * THE SOFTWARE.
  */
 
-import React from "react";
+import React, { useEffect, useRef } from "react";
+import { size } from "@floating-ui/dom";
+import type { Menu } from "bootstrap";
 import { Vote } from "@twotle/hexagon";
 import ElectionVote from "./ElectionVote";
 import { useLocalizations } from "../localizations";
 import { useElectionSubmit } from "../useElectionSubmit";
 import { ElectionTallyProps } from "../props/ElectionTallyProps";
+
+// the height of a fixed element along the viewport's edge (0 if hidden, e.g., the footer below sm)
+function coveredBy(selector: string) {
+  return document.querySelector(selector)?.getBoundingClientRect().height ?? 0;
+}
 
 function prettyLocalDateTimeString(locale: string, dateTime: string) {
   if (dateTime) {
@@ -88,28 +95,62 @@ function ElectionTally(props: Readonly<ElectionTallyProps>) {
   const { id, description, timeZone, candidates, votes } = props.election;
   candidates.sort((a,b)=>Date.parse(a)-Date.parse(b));
 
+  // The time-zone menu is long, and the fixed footer covers menus (its z-index is higher).
+  // So Floating UI's size middleware fits the menu between the fixed navbar and footer whenever Bootstrap positions it.
+  const timeZoneToggleRef = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    const toggle = timeZoneToggleRef.current;
+    if (toggle === null) {
+      return;
+    }
+    let timeZoneMenu: Menu | undefined;
+    let disposed = false;
+    // imported dynamically because route modules are also pre-rendered in Node (cf. entry.client.tsx)
+    import("bootstrap").then(({ Menu }) => {
+      if (!disposed) {
+        timeZoneMenu = Menu.getOrCreateInstance(toggle, {
+          floatingConfig: (config: Record<string, any>) => ({
+            ...config,
+            middleware: [
+              ...config.middleware,
+              size(() => ({
+                padding: { top: coveredBy("header.fixed-top"), bottom: coveredBy("footer.fixed-bottom") },
+                apply({ availableHeight, elements }) {
+                  elements.floating.style.setProperty("--bs-menu-max-height", `${Math.floor(availableHeight)}px`);
+                },
+              })),
+            ],
+          }),
+        });
+      }
+    });
+    return () => {
+      disposed = true;
+      timeZoneMenu?.dispose();
+    };
+  }, [timeZone]);
+
   const timeZones = props.timeZones.map((tz) => (
-    <li key={tz}>
-      <a
-        className="dropdonw-item"
-        href={`/elections/${id}/tally?${new URLSearchParams({ timeZone: tz })}#${props.token}`}
-      >
-        {tz}
-      </a>
-    </li>
+    <a
+      key={tz}
+      className="menu-item"
+      href={`/elections/${id}/tally?${new URLSearchParams({ timeZone: tz })}#${props.token}`}
+    >
+      {tz}
+    </a>
   ));
 
   const cN = (bla?: string) => {
     if (bla === undefined) {
-      return "table-light";
+      return "theme-secondary";
     }
 
     if (bla === "No") {
-      return "table-danger";
+      return "theme-danger";
     } else if (bla === "IfNeedBe") {
-      return "table-warning";
+      return "theme-warning";
     } else if (bla === "Yes") {
-      return "table-success";
+      return "theme-success";
     } else {
       throw new Error("unmapped enum value");
     }
@@ -151,27 +192,29 @@ function ElectionTally(props: Readonly<ElectionTallyProps>) {
         <div className="table-responsive">
           <table className="table table-bordered">
             <thead>
-              <tr className="table-info">
+              <tr className="theme-info">
                 <th>
                   {timeZone ? (
                     <React.Fragment>
                       {localizations["datesAndTimes.timeZone"]}: {timeZone}
-                      <div className="dropdown">
+                      <div>
                         <button
-                          className="btn btn-sm btn-link dropdown-toggle"
+                          ref={timeZoneToggleRef}
+                          className="btn-link btn-sm"
                           type="button"
-                          id="dropdownMenuLink"
-                          data-bs-toggle="dropdown"
+                          id="timeZoneMenuToggle"
+                          data-bs-toggle="menu"
                           aria-expanded="false"
                         >
                           {localizations["votes.convertToDifferentTimeZone"]}
                         </button>
-                        <ul
-                          className="dropdown-menu"
-                          aria-labelledby="dropdownMenuLink"
+                        {/* theme-reset: the menu items would otherwise inherit the row's theme-info */}
+                        <div
+                          className="menu menu-scrollable theme-reset"
+                          aria-labelledby="timeZoneMenuToggle"
                         >
                           {timeZones}
-                        </ul>
+                        </div>
                       </div>
                     </React.Fragment>
                   ) : (
@@ -197,8 +240,8 @@ function ElectionTally(props: Readonly<ElectionTallyProps>) {
                       best[0] === yinbn[0] &&
                       best[1] === yinbn[1] &&
                       best[2] === yinbn[2]
-                        ? "table-primary"
-                        : "table-secondary"
+                        ? "theme-primary"
+                        : "theme-secondary"
                     }
                   >
                     {yinbn[0] + yinbn[1]} ({yinbn[0]}:{yinbn[1]})
@@ -226,7 +269,7 @@ function ElectionTally(props: Readonly<ElectionTallyProps>) {
                   <td>
                     <button
                       type="button"
-                      className="btn btn-light"
+                      className="btn-solid theme-secondary"
                       onClick={(e) => deleteVote(e, vote.name, vote.voted)}
                     >
                       {localizations["votes.revoke"]}{" "}
