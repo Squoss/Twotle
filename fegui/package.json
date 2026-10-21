@@ -28,5 +28,8 @@
     "start": "react-router dev",
     "build": "react-router typegen && tsc -b && react-router build",
     "typecheck": "react-router typegen && tsc -b"
+  },
+  "allowScripts": {
+    "fsevents": false
   }
 }
