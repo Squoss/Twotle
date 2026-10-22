@@ -1,1 +1,3 @@
 # beapi and fegui have their own .gitignore file each
+
+.DS_Store

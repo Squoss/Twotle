@@ -16,6 +16,18 @@ updates:
       npm:
         patterns: [ "*" ]
 
+  - package-ecosystem: "sbt"
+    directory: "/beapi"
+    schedule:
+      interval: "weekly"
+    groups:
+      sbt:
+        patterns: [ "*" ]
+    ignore:
+      # pinned to the Scala 3.9 LTS line on purpose; bump minor versions manually
+      - dependency-name: "org.scala-lang:scala3-library_3"
+        update-types: [ "version-update:semver-minor", "version-update:semver-major" ]
+
   - package-ecosystem: "docker"
     directory: "/"
     schedule:
@@ -24,6 +36,8 @@ updates:
       docker:
         patterns: [ "*" ]
     ignore:
-      # pinned to the Node 24 LTS line on purpose; bump major versions manually
+      # pinned to the LTS lines on purpose (Node 24, JDK 25); bump major versions manually
       - dependency-name: "node"
+        update-types: [ "version-update:semver-major" ]
+      - dependency-name: "eclipse-temurin"
         update-types: [ "version-update:semver-major" ]

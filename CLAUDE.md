@@ -49,7 +49,7 @@ npm run typecheck   # Generate route types (.react-router/) and type-check the a
 npm run build       # Pre-render the SPA into build/client (Play serves its index.html and, under /fegui/, its assets)
 ```
 
-From the repository root, `docker build --target react .` builds the frontend the way CI's delivery (GHCR) and deployment (Clever Cloud) do: on Linux, in `node:24`.
+From the repository root, `docker build --target react .` builds the frontend the way CI's delivery (GHCR) does: on Linux, in `node:24`.
 
 ### Development Workflow
 Run both servers simultaneously:
@@ -181,7 +181,7 @@ Import the hexagon via `@twotle/hexagon` (the `hexagon/src/index.ts` barrel), ne
   - Hence there is no cookie banner: the site only sets cookies it needs (`PLAY_SESSION` for the CSRF token) or that store a choice (`PLAY_LANG`), and stores nothing else in the browser.
   - The site makes no third-party requests (the CSP's origins are all `'self'`), and the notification adapters log no recipients.
   - So a change to cookies, browser storage, third-party requests (the CSP's origins), log contents, stored data, or providers (e.g., `di.sms`, the MongoDB host) must update both locales of the privacy policy (`components/legalese/`), and the two locales must say the same.
-  - Facts only Squeng AG can supply go in as `{TODO: …}` placeholders. Since Clever Cloud deploys main, `grep -rn "{TODO" fegui/app/components/legalese` must come back empty before committing.
+  - Facts only Squeng AG can supply go in as `{TODO: …}` placeholders. Since CI delivers main to GHCR (`ghcr.io/squoss/twotle:latest`), `grep -rn "{TODO" fegui/app/components/legalese` must come back empty before committing.
 
 #### Gotchas
 
