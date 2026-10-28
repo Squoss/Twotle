@@ -17,7 +17,7 @@ updates:
         patterns: [ "*" ]
 
   - package-ecosystem: "sbt"
-    directory: [ "/beapi", "/beapi/hexagon/*" ]
+    directories: [ "/beapi", "/beapi/hexagon/*" ]
     schedule:
       interval: "weekly"
     groups:
