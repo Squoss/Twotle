@@ -3,7 +3,7 @@ scalacOptions += "-no-indent" // https://docs.scala-lang.org/scala3/reference/ot
 scalacOptions += "-Yexplicit-nulls" // https://docs.scala-lang.org/scala3/reference/experimental/explicit-nulls.html#java-interoperability-and-flexible-types
 
 libraryDependencies += "jakarta.inject" % "jakarta.inject-api" % "2.0.1"
-libraryDependencies += "com.googlecode.libphonenumber" % "libphonenumber" % "9.0.41"
+libraryDependencies += "com.googlecode.libphonenumber" % "libphonenumber" % "9.0.42"
 
 // using https://scalameta.org/munit/ from the https://docs.scala-lang.org/toolkit/introduction.html#what-is-the-scala-toolkit
 // previously (yes, not scalatestplus-play): libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.20" % Test
