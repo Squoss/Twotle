@@ -27,7 +27,7 @@ jobs:
         # Disabling shallow clone is recommended for improving relevancy of reporting
           fetch-depth: 0
       - name: back-end and front-end
-        uses: SonarSource/sonarqube-scan-action@d209202bc7d53ff1cc128f7f907dac145c9d6ae9 # v8.3.0
+        uses: SonarSource/sonarqube-scan-action@4d1dc0c91ee400dcf8a6dddf2f705ac36542e304 # v8.4.0
         with:
           # https://docs.sonarcloud.io/advanced-setup/analysis-scope/#restrict-the-scope-of-analysis-in-general
           args: >
@@ -47,7 +47,7 @@ jobs:
     if: ${{ github.event_name == 'schedule' || github.event.workflow_run.conclusion == 'success' }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: sbt/setup-sbt@ecad189dd245444b9ae0a0cd5922fd938b88906f # v1.5.12
+      - uses: sbt/setup-sbt@b113b960ba361e87e08ce02a390d51871b7ee459 # v1.5.13
       - uses: scalacenter/sbt-dependency-submission@d84eef4c09e633bcf5f113bcad7fd5e9af1baee9 # v3.2.3
         with:
           ## Optional: Define the working directory of your build.
